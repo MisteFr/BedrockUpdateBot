@@ -18,7 +18,6 @@ class BedrockUpdateBotManager {
         this.needConfirmation = undefined;
         this.needConfirmationAuthor = undefined;
         this.LastContent = undefined;
-        this.postedPM = false;
         this.config = config;
     }
 
@@ -108,7 +107,7 @@ class BedrockUpdateBotManager {
             for (let i = 0; i < messageCount; i++) {
                 if (messagesArr[i].author.username == "BedrockUpdateBot" && messagesArr[i].content.includes("CONSOLE")) {
                     if (i2 == 0) {
-                        messagesArr[i].edit("```" + LastContent + "\n" + content + "```");
+                        messagesArr[i].edit("```" + this.LastContent + "\n" + content + "```");
                         this.LastContent = this.LastContent + "\n" + content;
                     }
                     i2++;
@@ -129,6 +128,12 @@ class BedrockUpdateBotManager {
             });
         })
             .on('error', callback);
+    }
+
+    titleCase(str) {
+        return str.toLowerCase().split(' ').map(function (word) {
+            return word.replace(word[0], word[0].toUpperCase());
+        }).join(' ');
     }
 
 }

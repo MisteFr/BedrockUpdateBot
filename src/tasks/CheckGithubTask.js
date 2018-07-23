@@ -58,23 +58,6 @@ class CheckGithubTask {
                 }
             }
         })
-
-        var url = "https://api.github.com/repos/pmmp/PocketMine-MP"
-        request({
-            url: url,
-            json: true,
-            headers: {
-                'User-Agent': 'request'
-            }
-        }, function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-                if (body["stargazers_count"] == 1000 && botManager.postedPM == false) {
-                    botManager.postedPM = true;
-                    botManager.channelToSend.send(":tada::tada::tada::tada:")
-                    botManager.channelToSend.send("The PocketMine-MP Repository just reached 1000 :star: !")
-                }
-            }
-        })
     }
 }
 

@@ -8,12 +8,6 @@ require('./../BedrockUpdateBot.js');
 
 class Decompiler {
 
-    static titleCase(str) {
-        return str.toLowerCase().split(' ').map(function (word) {
-            return word.replace(word[0], word[0].toUpperCase());
-        }).join(' ');
-    }
-
     static checkMessage(message) {
         if (message.author.username == "MCPE Google Play Updates" && message.channel.name == "updates") {
             if (message.content.includes("APK file now available for com.mojang.minecraftpe " + botManager.config["lastVersionReleased"]) && message.content.includes("arm")) {
@@ -207,7 +201,7 @@ class Decompiler {
                                                         additionalInfosOfPackets.forEach(function (sectionTextPart) {
                                                             for (var key in Added) {
                                                                 var value = Added[key];
-                                                                if (sectionTextPart.includes(value) && sectionTextPart.includes(this.titleCase((key.replace(/_/g, " "))))) {
+                                                                if (sectionTextPart.includes(value) && sectionTextPart.includes(botManager.titleCase((key.replace(/_/g, " "))))) {
                                                                     botManager.channelToDebugMcpe.send(sectionTextPart)
                                                                 }
                                                             }
@@ -234,19 +228,18 @@ class Decompiler {
                                                             if (oldId !== null) {
                                                                 oldId = oldId[1];
                                                             }
-
                                                             if (newId !== null && oldId !== null && newId == oldId) {
                                                                 if (sectionTextPart !== oldSectionTextPart) {
                                                                     var diff = JsDiff.diffLines(oldSectionTextPart, sectionTextPart);
                                                                     diff.forEach(function (part) {
                                                                         if (part.added !== undefined || part.removed !== undefined) {
-                                                                            if (part.added !== undefined) {
-                                                                                if (part.value.includes("BinaryStream") && part.value.includes("getB") || part.value.includes("writeB") || part.value.includes("writeF") || part.value.includes("writeN") || part.value.includes("writeS") || part.value.includes("writeU") || part.value.includes("writeV") || part.value.includes("getD") || part.value.includes("getF") || part.value.includes("getI") || part.value.includes("getS") || part.value.includes("getT") || part.value.includes("getV")) {
-                                                                                    botManager.channelToDebugMcpe.send("Detected something added in " + this.titleCase((oldPacketsNameToId[oldId].replace(/_/g, " "))) + " (" + newId + ")\n\n```\n" + part.value.replace("```", "") + "\n```")
+                                                                            if (part.added !== undefined && part.value !== undefined) {
+                                                                                if (part.value.includes("BinaryStream") && (part.value.includes("getB") || part.value.includes("writeB") || part.value.includes("writeF") || part.value.includes("writeN") || part.value.includes("writeS") || part.value.includes("writeU") || part.value.includes("writeV") || part.value.includes("getD") || part.value.includes("getF") || part.value.includes("getI") || part.value.includes("getS") || part.value.includes("getT") || part.value.includes("getV"))) {
+                                                                                    botManager.channelToDebugMcpe.send("Detected something added in " + botManager.titleCase((oldPacketsNameToId[oldId].replace(/_/g, " "))) + " (" + newId + ")\n\n```\n" + new String(part.value).replace("```", "") + "\n```")
                                                                                 }
-                                                                            } else if (part.removed !== undefined) {
-                                                                                if (part.value.includes("BinaryStream") && part.value.includes("getB") || part.value.includes("writeB") || part.value.includes("writeF") || part.value.includes("writeN") || part.value.includes("writeS") || part.value.includes("writeU") || part.value.includes("writeV") || part.value.includes("getD") || part.value.includes("getF") || part.value.includes("getI") || part.value.includes("getS") || part.value.includes("getT") || part.value.includes("getV")) {
-                                                                                    botManager.channelToDebugMcpe.send("Detected something removed in " + this.titleCase((oldPacketsNameToId[oldId].replace(/_/g, " "))) + " (" + newId + ")\n\n```\n" + part.value.replace("```", "") + "\n```")
+                                                                            } else if (part.removed !== undefined && part.value !== undefined) {
+                                                                                if (part.value.includes("BinaryStream") && (part.value.includes("getB") || part.value.includes("writeB") || part.value.includes("writeF") || part.value.includes("writeN") || part.value.includes("writeS") || part.value.includes("writeU") || part.value.includes("writeV") || part.value.includes("getD") || part.value.includes("getF") || part.value.includes("getI") || part.value.includes("getS") || part.value.includes("getT") || part.value.includes("getV"))) {
+                                                                                    botManager.channelToDebugMcpe.send("Detected something removed in " + botManager.titleCase((oldPacketsNameToId[oldId].replace(/_/g, " "))) + " (" + newId + ")\n\n```\n" + new String(part.value).replace("```", "") + "\n```")
                                                                                 }
                                                                             }
                                                                         }

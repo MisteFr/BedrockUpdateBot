@@ -15,7 +15,7 @@ Bot.on('error', e => {
   console.error(e);
   Bot.users.forEach(function (element) {
     if (element.username == "Miste") {
-      element.send("[ERROR] " + e);
+      element.send("[ERROR] " + e.message);
     }
   });
 });
@@ -46,7 +46,7 @@ Bot.on('message', message => {
     }
   }
 
-  if (message.content.includes("doubt")) {
+  if (message.content.includes("doubt") && message.content.length < 7) {
     message.react("🇽")
   }
   var args = message.content.split(" ").slice(1);
@@ -112,8 +112,8 @@ Bot.on('message', message => {
   let commandName = realargs.shift();
   let command = Bot.commands.get(commandName);
 
-  if (command === undefined){
-    return message.reply("Unknown command. Type >help to receive a list of the available commands.");
+  if (command === undefined) {
+    return;
   }
 
   if (command.getPermission() == 'miste' && message.author.username !== "Miste") {
