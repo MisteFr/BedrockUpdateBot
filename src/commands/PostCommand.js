@@ -14,7 +14,7 @@ class PostCommand {
     }
 
     static executeCommand(message) {
-        botManager.channelToSend.send(message.content.replace(">post", ""));
+        botManager.sendToChannels('pmmp', message.content.replace(">post", ""))
     }
 }
 

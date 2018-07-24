@@ -20,8 +20,48 @@ Bot.on('error', e => {
   });
 });
 
+Bot.on("guildCreate", guild => {
+  botManager.getDefaultChannel(guild)
+    .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+  botManager.config["waitingForFinalRegister"].push(guild.id)
+  botManager.saveConfig()
+})
+
+
+Bot.on("guildDelete", guild => {
+  if (botManager.config['channels'][guild.id] !== null && botManager.config['channels'][guild.id] !== undefined) {
+    delete botManager.config['channels'][guild.id]
+    botManager.saveConfig()
+    if (botManager.Bot.channelsToSend.has(guild.id)) {
+      botManager.Bot.channelsToSend.delete(guild.id)
+    }
+  }
+})
+
 
 Bot.on('message', message => {
+
+  if (message.guild !== null && message.author.username !== "BedrockUpdateBot") {
+    if (botManager.config["waitingForFinalRegister"].includes(message.guild.id) && message.content.includes('The channel I chose is') && !message.content.includes('Thanks for')) {
+      var nameOfTheChannel = (message.content.replace("The channel I chose is", "")).replace(/\s/g, '');
+      var channelChose = Bot.guilds.get(message.guild.id).channels.find('name', nameOfTheChannel);
+      if (channelChose !== null && channelChose !== undefined) {
+        if (message.author.id === message.guild.ownerID) {
+          var objectToSave = {}
+          objectToSave[nameOfTheChannel] = ["news"];
+          botManager.config['channels'][message.guild.id] = [objectToSave];
+          botManager.Bot.channelsToSend.set(message.guild.id, botManager.config["channels"][message.guild.id]);
+          message.reply("Correctly setted up the bot for this discord server !\nYou will now receive all the Minecraft & Minecraft Bedrock latest news on the channel " + nameOfTheChannel)
+          botManager.config["waitingForFinalRegister"] = botManager.config["waitingForFinalRegister"].filter(item => item !== message.guild.id)
+          botManager.saveConfig()
+        } else {
+          message.reply("Only the owner of the discord server can set the channel.")
+        }
+      } else {
+        message.reply("Can't find the channel (" + nameOfTheChannel + ") on this discord server. Please retry: The channel I chose is <name>")
+      }
+    }
+  }
 
   if (botManager.needConfirmation === true && message.author.username === botManager.needConfirmationAuthor) {
     if (message.content === (botManager.needConfirmationAuthor + " confirms that he wants to stop this bot")) {
@@ -74,11 +114,8 @@ Bot.on('message', message => {
               .setTitle(`A new version is out on the Google Play Store for beta users: ` + message.embeds[0].title + " :pushpin:")
               .setColor('#0941a9')
               .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-            botManager.channelToSend3.send({ embed })
-            embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-            //channelToSend4.send({ embed })
-            botManager.channelToSend2.send({ embed })
-            botManager.channelToTest.send("A new version is out on the GooglePlayStore for beta users! (" + message.embeds[0].title + ") ");
+            botManager.sendToChannels('news', embed)
+            botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore for beta users! (" + message.embeds[0].title + ") ")
           }
         });
         botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store for beta users: ' + botManager.config["lastVersionAndroidBeta"] + " !\n\n#RT" }, function (error, tweet, response) { });
@@ -95,11 +132,8 @@ Bot.on('message', message => {
               .setTitle(`A new version is out on the Google Play Store: ` + botManager.config["lastVersionAndroid"] + " :pushpin:")
               .setColor('#0941a9')
               .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-            botManager.channelToSend3.send({ embed })
-            embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-            //botManager.channelToSend4.send({ embed })
-            botManager.channelToSend2.send({ embed })
-            botManager.channelToTest.send("A new version is out on the GooglePlayStore ! (" + message.embeds[0].title + ") ");
+            botManager.sendToChannels('news', embed)
+            botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + message.embeds[0].title + ") ")
           }
         });
         botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store: ' + botManager.config["lastVersionAndroid"] + " !\n\n#RT" }, function (error, tweet, response) { });
@@ -127,8 +161,3 @@ Bot.on('message', message => {
     console.log(error);
   }
 });
-
-function sleep(sleepDuration) {
-  var now = new Date().getTime();
-  while (new Date().getTime() < now + sleepDuration) { /* do nothing (doesnt affect the child process)*/ }
-}

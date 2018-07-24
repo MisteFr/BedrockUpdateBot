@@ -32,11 +32,7 @@ class CheckMCLauncherVersionTask {
                         .setColor('#0941a9')
                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                         .setFooter("Release time: " + (new Date(body["versions"][0]["releaseTime"])).toString())
-                    botManager.channelToSend.send({ embed })
-                    botManager.channelToSend3.send({ embed })
-                    embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-                    //botManager.channelToSend4.send({ embed })
-                    botManager.channelToSend2.send({ embed })
+                    botManager.sendToChannels('news', embed)
 
                     botManager.client.post('statuses/update', { status: '📌 A new ' + body["versions"][0]["type"] + ' is out on the minecraft launcher ' + botManager.config["lastMcVersion"] + " !\n\n#RT" }, function (error, tweet, response) { });
 

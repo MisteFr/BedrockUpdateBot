@@ -26,10 +26,7 @@ class CheckTeamMojangChannelTask {
                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                         .setDescription("**Title**: " + body["title"] + "\n**Description**: " + body["description"] + "\n**Published at**: " + body["publishedAt"]);
                     embed.setURL("https://www.youtube.com/watch?v=" + body["id"]["videoId"])
-                    botManager.channelToSend3.send({ embed })
-                    embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-                    //botManager.channelToSend4.send({ embed })
-                    botManager.channelToSend2.send({ embed })
+                    botManager.sendToChannels('news', embed)
                     botManager.config["latestVideo2"] = botManager.config["latestVideo"];
                     botManager.config["latestVideo"] = body["title"];
                     botManager.saveConfig()

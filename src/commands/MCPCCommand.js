@@ -27,7 +27,7 @@ class MCPCCommand {
 
             if (body.status) {
                 const embed = new Discord.RichEmbed()
-                    .setTitle(`Status of ${body.hostname}:${body.port} :`)
+                    .setTitle(`Status of ${body.hostname}:${body.port}`)
                     .setColor('#0941a9')
                     .setAuthor(botManager.username, botManager.avatarURL)
                     .setFooter(`Status asked by ${message.author.username}`, message.author.avatarURL)

@@ -35,12 +35,9 @@ class CheckMCPEVersionTask {
                                     .setDescription(body["Android"]["Description"])
                                     .setColor('#0941a9')
                                     .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-                                botManager.channelToSend.send({ embed })
-                                botManager.channelToSend3.send({ embed })
-                                embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-                                //botManager.channelToSend4.send({ embed })
-                                botManager.channelToSend2.send({ embed })
-                                botManager.channelToTest.send("A new version is out on the GooglePlayStore ! (" + body["Android"]["Version"] + ") ");
+                                botManager.sendToChannels('news', embed)
+                                //botManager.sendToChannels('pmmp', '!force_check')
+                                botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + body["Android"]["Version"] + ") ")
                             }
                         });
                         botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store: ' + body["Android"]["Version"] + " !\n\n#RT" }, function (error, tweet, response) { });
@@ -60,12 +57,8 @@ class CheckMCPEVersionTask {
                                     .setTitle(`A new version is out on the Amazon Store: ` + botManager.config["lastVersionAmazon"] + " :pushpin:")
                                     .setColor('#0941a9')
                                     .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-                                botManager.channelToSend.send({ embed })
-                                botManager.channelToSend3.send({ embed })
-                                embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-                                //channelToSend4.send({ embed })
-                                botManager.channelToSend2.send({ embed })
-                                botManager.channelToTest.send("A new version is out on the AmazonStore ! (" + body["Amazon"]["Version"] + ") ");
+                                botManager.sendToChannels('news', embed)
+                                botManager.sendToChannels('debug', "A new version is out on the AmazonStore ! (" + body["Amazon"]["Version"] + ") ")
                             }
                         });
                         botManager.client.post('statuses/update', { status: '📌 A new version is out on the AmazonStore: ' + body["Amazon"]["Version"] + " !\n\n#RT" }, function (error, tweet, response) { });

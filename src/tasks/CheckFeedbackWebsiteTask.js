@@ -46,15 +46,8 @@ class CheckFeedbackWebsiteTask {
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2.substr(0, 2048))
                             .setURL("https://feedback.minecraft.net" + body["Release"][2])
-                        botManager.channelToSend.send({ embed })
-                        botManager.channelToSend.send("You can see the rest of the changelog on the website (too big to be displayed here).")
-                        botManager.channelToSend3.send({ embed })
-                        botManager.channelToSend3.send("You can see the rest of the changelog on the website (too big to be displayed here).")
-                        embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-                        botManager.channelToSend2.send({ embed })
-                        botManager.channelToSend2.send("You can see the rest of the changelog on the website (too big to be displayed here).")
-                        //botManager.channelToSend4.send({ embed })
-                        //botManager.channelToSend4.send("You can see the rest of the changelog on the website (too big to be displayed here).")
+                        botManager.sendToChannels('news', embed)
+                        botManager.sendToChannels('news', "You can see the rest of the changelog on the website (too big to be displayed here).")
                     } else {
                         var embed = new Discord.RichEmbed()
                             .setTitle(`A new article is out: ` + body["Release"][0] + " :pushpin:")
@@ -62,11 +55,7 @@ class CheckFeedbackWebsiteTask {
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2)
                             .setURL("https://feedback.minecraft.net" + body["Release"][2])
-                        botManager.channelToSend.send({ embed })
-                        botManager.channelToSend3.send({ embed })
-                        embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-                        botManager.channelToSend2.send({ embed })
-                        //channelToSend4.send({ embed })
+                        botManager.sendToChannels('news', embed)
                     }
                     console.log(body["Release"][0]);
                     botManager.config["latestFeedbackArticleRelease2"] = botManager.config["latestFeedbackArticleRelease"];
@@ -107,15 +96,8 @@ class CheckFeedbackWebsiteTask {
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2.substr(0, 2048))
                             .setURL("https://feedback.minecraft.net" + body["Beta"][2])
-                        botManager.channelToSend.send({ embed })
-                        botManager.channelToSend.send("You can see the rest of the changelog on the website (too big to be displayed here).")
-                        botManager.channelToSend3.send({ embed })
-                        botManager.channelToSend3.send("You can see the rest of the changelog on the website (too big to be displayed here).")
-                        embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-                        botManager.channelToSend2.send({ embed })
-                        botManager.channelToSend2.send("You can see the rest of the changelog on the website (too big to be displayed here).")
-                        //channelToSend4.send({ embed })
-                        //channelToSend4.send("You can see the rest of the changelog on the website (too big to be displayed here).")
+                        botManager.sendToChannels('news', embed)
+                        botManager.sendToChannels('news', "You can see the rest of the changelog on the website (too big to be displayed here).")
                     } else {
                         var embed = new Discord.RichEmbed()
                             .setTitle(`A new article is out: ` + body["Beta"][0] + " :pushpin:")
@@ -123,11 +105,7 @@ class CheckFeedbackWebsiteTask {
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2)
                             .setURL("https://feedback.minecraft.net" + body["Beta"][2])
-                        botManager.channelToSend.send({ embed })
-                        botManager.channelToSend3.send({ embed })
-                        embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-                        botManager.channelToSend2.send({ embed })
-                        botManager.channelToSend4.send({ embed })
+                        botManager.sendToChannels('news', embed)
                     }
                     console.log(body["Beta"][0]);
                     botManager.config["latestFeedbackArticleBeta2"] = botManager.config["latestFeedbackArticleBeta"];

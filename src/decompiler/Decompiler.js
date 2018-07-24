@@ -217,7 +217,7 @@ class Decompiler {
 
                                                     var oldAdditionalInfosOfPackets = oldSecondPart.split('~~~');
 
-
+                                                    botManager.updateConsole("Comparing write&read methods for each packets with the db from the last version..")
                                                     additionalInfosOfPackets.forEach(function (sectionTextPart) {
                                                         var newId = sectionTextPart.match(new RegExp('PacketID:' + '\\s(\\w+)'));
                                                         if (newId !== null) {

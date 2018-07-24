@@ -41,12 +41,7 @@ class CheckMinecraftWebsiteTask {
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setURL("https://minecraft.net" + element["url"])
                             .setImage(element["default_tile"]["image"]["original"]["url"])
-                            botManager.channelToSend.send({ embed })
-                            botManager.channelToSend3.send({ embed })
-                            botManager.channelToTest.send({ embed });
-                        embed.setFooter("Made with ❤ by Miste (https://twitter.com/Misteboss_mcpe)", "https://cdn.discordapp.com/avatars/198825092547870721/ac3aa3645c92a29a0a7de0957d3622fb.png")
-                        //botManager.channelToSend4.send({ embed })
-                        botManager.channelToSend2.send({ embed })
+                        botManager.sendToChannels('news', embed)
 
                         botManager.getImage(element["default_tile"]["image"]["original"]["url"], function (err, data) {
                             if (err) {
