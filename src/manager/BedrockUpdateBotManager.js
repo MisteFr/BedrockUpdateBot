@@ -27,7 +27,7 @@ class BedrockUpdateBotManager {
         this.avatarURL = Bot.user.avatarURL;
         this.username = Bot.user.username;
 
-        Bot.user.setActivity("Mojang", { type: ("WATCHING") });
+        Bot.user.setActivity("Mojang | >help", { type: ("WATCHING") });
 
         console.log('Logging in Twitter..')
         this.client = new Twitter({

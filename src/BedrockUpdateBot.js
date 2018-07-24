@@ -20,7 +20,12 @@ Bot.on('error', e => {
   });
 });
 
+Bot.on('reconnecting', () => {
+  botManager.sendToChannels("debug", "It looks like I am having issues with the discord API..")
+});
+
 Bot.on("guildCreate", guild => {
+  console.log(guild.name)
   botManager.getDefaultChannel(guild)
     .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
   botManager.config["waitingForFinalRegister"].push(guild.id)
