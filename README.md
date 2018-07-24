@@ -7,4 +7,4 @@ List of supported news:
   - New version/snapshot available on the MC Launcher
   - New video available on the TeamMojang YouTube channel
   
- For the moment you can't add this bot to your server because it doesnt support multi servers but this will soon be implemented. 
+ You can now add this bot to your server by clicking on the following link: https://discordapp.com/oauth2/authorize?client_id=410839949802209280&scope=bot&permissions=36703296.
