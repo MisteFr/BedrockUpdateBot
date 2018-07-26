@@ -1,10 +1,10 @@
-var yaml_config = require('node-yaml');
-var config = yaml_config.readSync("./../../config.yml");
-var fs = require('fs');
-var https = require('https');
-var Repeat = require('repeat');
-var path = require("path");
-var Twitter = require('twitter');
+const yaml_config = require('node-yaml');
+const config = yaml_config.readSync("./../../config.yml");
+const fs = require('fs');
+const https = require('https');
+const Repeat = require('repeat');
+const path = require("path");
+const Twitter = require('twitter');
 const Discord = require('discord.js');
 
 class BedrockUpdateBotManager {
@@ -27,7 +27,7 @@ class BedrockUpdateBotManager {
         this.avatarURL = Bot.user.avatarURL;
         this.username = Bot.user.username;
 
-        Bot.user.setActivity("Mojang | >help", { type: ("WATCHING") });
+        Bot.user.setActivity("Mojang | >help | " + this.Bot.guilds.size + " guilds", { type: ("WATCHING") });
 
         console.log('Logging in Twitter..')
         this.client = new Twitter({

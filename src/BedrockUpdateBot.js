@@ -25,6 +25,8 @@ Bot.on('reconnecting', () => {
 });
 
 Bot.on("guildCreate", guild => {
+  //guild.owner.client.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
+  Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
   console.log(guild.name)
   botManager.getDefaultChannel(guild)
     .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
@@ -41,6 +43,7 @@ Bot.on("guildDelete", guild => {
       botManager.Bot.channelsToSend.delete(guild.id)
     }
   }
+  Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
 })
 
 
@@ -103,7 +106,7 @@ Bot.on('message', message => {
   }
 
   if (message.author.username == "MCPE Google Play Updates" && message.embeds[0] !== undefined) {
-    if (message.embeds[0].title !== botManager.config["lastVersionAndroid"] && (message.embeds[0].title.replace(/[-)(]/g, '')).replace(/[- )(]/g, '_') !== botManager.config["lastVersionAndroidBeta"] && typeof message.embeds[0].description === 'undefined') {
+    if (message.embeds[0].title !== botManager.config["lastVersionAndroid"] && (message.embeds[0].title.replace(/[-)(]/g, '')).replace(/[- )(]/g, '_') !== botManager.config["lastVersionAndroidBeta"] && typeof message.embeds[0].description === undefined) {
       console.log(message.embeds[0].title);
 
       if (message.embeds[0].title.includes("(beta)")) {
@@ -155,8 +158,8 @@ Bot.on('message', message => {
     return;
   }
 
-  if (command.getPermission() == 'miste' && message.author.username !== "Miste") {
-    message.reply("You don't have permission to use this command!");
+  if (command.getPermission() == 'miste' && message.author.id != botManager.config['ownerId']) {
+    return message.reply("You don't have permission to use this command!");
   }
 
   try {

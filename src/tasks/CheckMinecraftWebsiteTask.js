@@ -1,7 +1,6 @@
 require('./../BedrockUpdateBot.js')
-var request = require('request');
+const request = require('request');
 const Discord = require('discord.js');
-var https = require('https');
 
 class CheckMinecraftWebsiteTask {
     static getDelay() {

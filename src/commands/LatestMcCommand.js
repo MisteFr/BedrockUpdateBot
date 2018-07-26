@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-var request = require('request');
+const request = require('request');
 
 class LatestMcCommand {
     static getName() {
