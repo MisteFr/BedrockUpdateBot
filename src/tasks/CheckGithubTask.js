@@ -1,5 +1,5 @@
 require('./../BedrockUpdateBot.js')
-const request = require('request');
+var request = require('request');
 const Discord = require('discord.js');
 
 class CheckGithubTask {
@@ -20,7 +20,7 @@ class CheckGithubTask {
             if (!error && response.statusCode === 200) {
                 if (body["commit"]["sha"] !== botManager.config["lastSteadfastSHA"]) {
                     Bot.users.forEach(function (element) {
-                        if (element.username == "Miste") {
+                        if (element.id == botManager.config['ownerId']) {
                             element.send("A new commit is available on Steadfast2: **" + body["commit"]["commit"]["message"] + "** (" + body["commit"]["html_url"] + ")")
                         }
                     });
@@ -46,7 +46,7 @@ class CheckGithubTask {
                                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                                         .setURL("https://github.com/Hydreon/Steadfast2/commit/" + botManager.config["lastSteadfastSHA"])
                                     Bot.users.forEach(function (element) {
-                                        if (element.username == "Miste") {
+                                        if (element.id == botManager.config['ownerId']) {
                                             element.send({ embed })
                                         }
                                     });

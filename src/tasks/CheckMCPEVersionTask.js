@@ -1,5 +1,5 @@
 require('./../BedrockUpdateBot.js')
-const request = require('request');
+var request = require('request');
 const Discord = require('discord.js');
 
 class CheckMCPEVersionTask {
@@ -23,7 +23,7 @@ class CheckMCPEVersionTask {
                     if (!body["Android"]["Version"].includes("Var")) {
                         console.log(body["Android"]["Version"])
                         Bot.users.forEach(function (element) {
-                            if (element.username == "Miste") {
+                            if (element.id == botManager.config['ownerId']) {
                                 element.send("A new version is out on the GooglePlayStore ! (" + body["Android"]["Version"] + ")");
                                 botManager.config["lastVersionAndroid2"] = botManager.config["lastVersionAndroid"];
                                 botManager.config["lastVersionAndroid"] = body["Android"]["Version"];
@@ -48,7 +48,7 @@ class CheckMCPEVersionTask {
                     if (!body["Amazon"]["Version"].includes("Var")) {
                         console.log(body["Amazon"]["Version"])
                         Bot.users.forEach(function (element) {
-                            if (element.username == "Miste") {
+                            if (element.id == botManager.config['ownerId']) {
                                 element.send("A new version is out on the AmazonStore ! (" + body["Amazon"]["Version"] + ")");
                                 botManager.config["lastVersionAmazon2"] = botManager.config["lastVersionAmazon"];
                                 botManager.config["lastVersionAmazon"] = body["Amazon"]["Version"];
@@ -68,7 +68,7 @@ class CheckMCPEVersionTask {
                 botManager.errorNumber++;
                 if (botManager.errorNumber > 2) {
                     Bot.users.forEach(function (element) {
-                        if (element.username == "Miste") {
+                        if (element.id == botManager.config['ownerId']) {
                             element.send("Can't ping the website.");
                         }
                     });

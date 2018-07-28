@@ -1,3 +1,6 @@
+const Discord = require('discord.js');
+var request = require('request');
+
 class ListEmojisCommand {
     static getName() {
         return 'listemojis';

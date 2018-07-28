@@ -14,7 +14,7 @@ Bot.on('ready', () => {
 Bot.on('error', e => {
   console.error(e);
   Bot.users.forEach(function (element) {
-    if (element.username == "Miste") {
+    if (element.id == botManager.config['ownerId']) {
       element.send("[ERROR] " + e.message);
     }
   });
@@ -25,13 +25,18 @@ Bot.on('reconnecting', () => {
 });
 
 Bot.on("guildCreate", guild => {
-  //guild.owner.client.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
+  guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
   Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
   console.log(guild.name)
   botManager.getDefaultChannel(guild)
     .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
   botManager.config["waitingForFinalRegister"].push(guild.id)
   botManager.saveConfig()
+  Bot.users.forEach(function (element) {
+    if (element.id == botManager.config['ownerId']) {
+      element.send("Added on " + guild.name + " owned by " + guild.owner.user.username + ".");
+    }
+  });
 })
 
 
@@ -44,6 +49,11 @@ Bot.on("guildDelete", guild => {
     }
   }
   Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
+  Bot.users.forEach(function (element) {
+    if (element.id == botManager.config["ownerId"]) {
+      element.send("Removed from " + guild.name + " owned by " + guild.owner.user.username + ".");
+    }
+  });
 })
 
 
@@ -76,7 +86,7 @@ Bot.on('message', message => {
       message.channel.send(message.author.username + " is stopping the bot !")
       message.channel.send("Shutting down ...")
       Bot.users.forEach(function (element) {
-        if (element.username == "Miste") {
+        if (element.id == botManager.config['ownerId']) {
           element.send(message.author.username + " is stopping the bot !")
         }
       });
@@ -111,39 +121,39 @@ Bot.on('message', message => {
 
       if (message.embeds[0].title.includes("(beta)")) {
         Bot.users.forEach(function (element) {
-          if (element.username == "Miste") {
-            element.send("A new version is out on the GooglePlayStore for beta users ! (" + message.embeds[0].title + ")");
-            botManager.config["lastVersionAndroidBeta2"] = botManager.config["lastVersionAndroidBeta"];
-            botManager.config["lastVersionAndroidBeta"] = (message.embeds[0].title.replace(/[-)(]/g, '')).replace(/[- )(]/g, '_');
-            botManager.config["lastVersionReleased"] = (message.embeds[0].title.replace("(beta)", "")).replace(/\s/g, '');
-            botManager.config["lastVersionReleasedIsBeta"] = true;
-            botManager.saveConfig()
-            var embed = new Discord.RichEmbed()
-              .setTitle(`A new version is out on the Google Play Store for beta users: ` + message.embeds[0].title + " :pushpin:")
-              .setColor('#0941a9')
-              .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-            botManager.sendToChannels('news', embed)
-            botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore for beta users! (" + message.embeds[0].title + ") ")
+          if (element.id == botManager.config['ownerId']) {
+            element.send("A new version is out on the GooglePlayStore for beta users ! (" + message.embeds[0].title + ")")
           }
         });
+        botManager.config["lastVersionAndroidBeta2"] = botManager.config["lastVersionAndroidBeta"];
+        botManager.config["lastVersionAndroidBeta"] = (message.embeds[0].title.replace(/[-)(]/g, '')).replace(/[- )(]/g, '_');
+        botManager.config["lastVersionReleased"] = (message.embeds[0].title.replace("(beta)", "")).replace(/\s/g, '');
+        botManager.config["lastVersionReleasedIsBeta"] = true;
+        botManager.saveConfig()
+        var embed = new Discord.RichEmbed()
+          .setTitle(`A new version is out on the Google Play Store for beta users: ` + message.embeds[0].title + " :pushpin:")
+          .setColor('#0941a9')
+          .setAuthor("BedrockUpdateBot", botManager.avatarURL)
+        botManager.sendToChannels('news', embed)
+        botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore for beta users! (" + message.embeds[0].title + ") ")
         botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store for beta users: ' + botManager.config["lastVersionAndroidBeta"] + " !\n\n#RT" }, function (error, tweet, response) { });
       } else if (message.embeds[0].title.match(/^[0-9. ]+$/) != null) {
         Bot.users.forEach(function (element) {
-          if (element.username == "Miste") {
+          if (element.id == botManager.config['ownerId']) {
             element.send("A new version is out on the GooglePlayStore ! (" + message.embeds[0].title + ")");
-            botManager.config["lastVersionAndroid2"] = botManager.config["lastVersionAndroid"];
-            botManager.config["lastVersionAndroid"] = message.embeds[0].title;
-            botManager.config["lastVersionReleased"] = message.embeds[0].title;
-            botManager.config["lastVersionReleasedIsBeta"] = false;
-            botManager.saveConfig()
-            var embed = new Discord.RichEmbed()
-              .setTitle(`A new version is out on the Google Play Store: ` + botManager.config["lastVersionAndroid"] + " :pushpin:")
-              .setColor('#0941a9')
-              .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-            botManager.sendToChannels('news', embed)
-            botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + message.embeds[0].title + ") ")
           }
         });
+        botManager.config["lastVersionAndroid2"] = botManager.config["lastVersionAndroid"];
+        botManager.config["lastVersionAndroid"] = message.embeds[0].title;
+        botManager.config["lastVersionReleased"] = message.embeds[0].title;
+        botManager.config["lastVersionReleasedIsBeta"] = false;
+        botManager.saveConfig()
+        var embed = new Discord.RichEmbed()
+          .setTitle(`A new version is out on the Google Play Store: ` + botManager.config["lastVersionAndroid"] + " :pushpin:")
+          .setColor('#0941a9')
+          .setAuthor("BedrockUpdateBot", botManager.avatarURL)
+        botManager.sendToChannels('news', embed)
+        botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + message.embeds[0].title + ") ")
         botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store: ' + botManager.config["lastVersionAndroid"] + " !\n\n#RT" }, function (error, tweet, response) { });
       }
     }

@@ -1,5 +1,5 @@
 require('./../BedrockUpdateBot.js')
-const request = require('request');
+var request = require('request');
 const Discord = require('discord.js');
 
 
@@ -62,7 +62,7 @@ class CheckFeedbackWebsiteTask {
                     botManager.config["latestFeedbackArticleRelease"] = body["Release"][0];
                     botManager.saveConfig()
                     Bot.users.forEach(function (element) {
-                        if (element.username == "Miste") {
+                        if (element.id == botManager.config['ownerId']) {
                             element.send("[RELEASE] A new article is out on the feedback website !");
                         }
                     });
@@ -112,7 +112,7 @@ class CheckFeedbackWebsiteTask {
                     botManager.config["latestFeedbackArticleBeta"] = body["Beta"][0];
                     botManager.saveConfig()
                     Bot.users.forEach(function (element) {
-                        if (element.username == "Miste") {
+                        if (element.id == botManager.config['ownerId']) {
                             element.send("[BETA] A new article is out on the feedback website !");
                         }
                     });
