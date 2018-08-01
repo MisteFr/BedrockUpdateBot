@@ -186,6 +186,16 @@ class BedrockUpdateBotManager {
         }).join(' ');
     }
 
+    cleanArray(actual) {
+        var newArray = new Array();
+        for (var i = 0; i < actual.length; i++) {
+          if (actual[i]) {
+            newArray.push(actual[i]);
+          }
+        }
+        return newArray;
+      }
+
     sleep(sleepDuration) {
         var now = new Date().getTime();
         while (new Date().getTime() < now + sleepDuration) { /* do nothing (doesnt affect the child process)*/ }

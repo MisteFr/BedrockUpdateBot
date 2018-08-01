@@ -12,16 +12,11 @@ Bot.on('ready', () => {
 });
 
 Bot.on('error', e => {
-  console.error(e);
   Bot.users.forEach(function (element) {
     if (element.id == botManager.config['ownerId']) {
       element.send("[ERROR] " + e.message);
     }
   });
-});
-
-Bot.on('reconnecting', () => {
-  botManager.sendToChannels("debug", "It looks like I am having issues with the discord API..")
 });
 
 Bot.on("guildCreate", guild => {

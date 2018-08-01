@@ -4,7 +4,7 @@ const getUrls = require('get-urls');
 const https = require('https');
 const StreamZip = require('node-stream-zip');
 const JsDiff = require('diff');
-const github = require('octonode')
+const github = require('octonode');
 
 require('./../BedrockUpdateBot.js');
 
@@ -31,21 +31,20 @@ class Decompiler {
                                     yaml_config.readSync(botManager.config["lastVersionReleasedIsBeta"] ? "./../../" + botManager.config["lastVersionAndroidBeta"] + ".yml" : "./../../" + botManager.config["lastVersionAndroid"] + ".yml");
                                 }
                                 catch (error) {
-                                    console.log(error)
                                     console.log("Getting an anti robot check, retrying")
                                     return download(url, botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta"] + ".yml" : botManager.config["lastVersionAndroid"] + ".yml", true, function foo() { }) //we don't need a callback but there must be one
                                 }
 
                                 var realUrl = Array.from(getUrls(yaml_config.readSync(botManager.config["lastVersionReleasedIsBeta"] ? "./../../" + botManager.config["lastVersionAndroidBeta"] + ".yml" : "./../../" + botManager.config["lastVersionAndroid"] + ".yml")))[0];
-                                download(realUrl, botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + ".apk" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + ".apk", false, function foo() { }) //we don't need a callback but there must be one
+                                download(realUrl, botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".apk" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".apk", false, function foo() { }) //we don't need a callback but there must be one
                             } else {
                                 fs.unlinkSync(botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta"] + ".yml" : botManager.config["lastVersionAndroid"] + ".yml");
-                                fs.rename(botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + ".apk" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + ".apk", botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + ".apk.zip" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + ".apk.zip", function (err) {
+                                fs.rename(botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".apk" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".apk", botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".apk.zip" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".apk.zip", function (err) {
                                     if (err) console.log('ERROR: ' + err);
                                 });
                                 console.log("Accessing to the .apk..")
                                 const zip = new StreamZip({
-                                    file: botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + ".apk.zip" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + ".apk.zip",
+                                    file: botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".apk.zip" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".apk.zip",
                                     storeEntries: true
                                 });
 
@@ -54,7 +53,7 @@ class Decompiler {
                                     for (const entry of Object.values(zip.entries())) {
                                         if (entry.name == "assets/profanity_filter.wlist") {
                                             if (entry.size !== botManager.config["profanityFilterSize"]) {
-                                                zip.extract('assets/profanity_filter.wlist', botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "_profanity_filter.wlist" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "_profanity_filter.wlist", err => {
+                                                zip.extract('assets/profanity_filter.wlist', botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_profanity_filter.wlist" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_profanity_filter.wlist", err => {
                                                     console.log(err ? 'Extract error' : 'Extracting profanity_filter.wlist');
                                                     console.log("Profanity filter was updated ! (" + botManager.config["profanityFilterSize"] + " to " + entry.size + " bytes)");
                                                     botManager.updateConsole("Profanity filter was updated ! (" + botManager.config["profanityFilterSize"] + " to " + entry.size + " bytes)");
@@ -64,12 +63,12 @@ class Decompiler {
                                             }
                                         }
                                         if (entry.name == "lib/armeabi-v7a/libminecraftpe.so") {
-                                            zip.extract('lib/armeabi-v7a/libminecraftpe.so', botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + ".so", err => {
+                                            zip.extract('lib/armeabi-v7a/libminecraftpe.so', botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", err => {
                                                 botManager.updateConsole(err ? 'Extract error' : 'Extracting libminecraftpe.so');
                                                 zip.close();
                                                 console.log('Getting the packets list');
                                                 const { exec } = require('child_process');
-                                                exec(botManager.config["lastVersionReleasedIsBeta"] ? "python packets.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python packets.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 500 }, (err, stdout, stderr) => {
+                                                exec(botManager.config["lastVersionReleasedIsBeta"] ? "python packets.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python packets.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 500 }, (err, stdout, stderr) => {
                                                     if (err) {
                                                         console.log(err.message)
                                                         return;
@@ -154,41 +153,41 @@ class Decompiler {
                                                     var fixedText = "";
 
                                                     if (someAdded == true) {
-                                                        fixedText = fixedText + "There is some packets added in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] : botManager.config["lastVersionAndroid2"]);
+                                                        fixedText = fixedText + "\n" + "There are some packets added in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
                                                         console.log('Found new packet(s) !');
                                                         console.log(Added)
                                                         botManager.updateConsole('\nFound new packet(s) !');
-                                                        botManager.sendToChannels('pmmp', 'Found new packet(s) in ' + botManager.config['lastVersionReleased'])
+                                                        botManager.sendToChannels('pmmp', 'Found new packet(s) in ' + botManager.config['lastVersionReleased'] + ".")
                                                         for (var key in Added) {
                                                             var value = Added[key];
                                                             botManager.updateConsole('   - ' + key + ' (' + value + ')');
                                                             botManager.sendToChannels('pmmp', '   - ' + key + ' (' + value + ')')
-                                                            fixedText = fixedText + "    - " + key + " (" + value + ")"
+                                                            fixedText = fixedText + "\n" + "    - " + key + " (" + value + ")"
                                                         }
                                                     } else {
                                                         console.log('There is no packets added');
-                                                        botManager.updateConsole('\nThere is no packets added');
-                                                        botManager.sendToChannels('pmmp', 'There is no packets added in ' + botManager.config['lastVersionReleased'])
-                                                        fixedText = fixedText + "There is no packets added in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] : botManager.config["lastVersionAndroid2"]);
+                                                        botManager.updateConsole('\nThere are no packets added');
+                                                        botManager.sendToChannels('pmmp', 'There are no packets added in ' + botManager.config['lastVersionReleased'] + ".")
+                                                        fixedText = fixedText + "\n" + "There are no packets added in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
                                                     }
 
                                                     if (someRemoved == true) {
-                                                        fixedText = fixedText + "\n" + "There is some packets removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] : botManager.config["lastVersionAndroid2"]);
+                                                        fixedText = fixedText + "\n" + "There are some packets removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
                                                         console.log('There is some removed packet(s) !');
                                                         console.log(Removed)
-                                                        botManager.updateConsole('\nThere is some removed packet(s) !');
-                                                        botManager.sendToChannels('pmmp', 'There is some packets removed in ' + botManager.config['lastVersionReleased'])
+                                                        botManager.updateConsole('\nThere are some removed packet(s) !');
+                                                        botManager.sendToChannels('pmmp', 'There are some packets removed in ' + botManager.config['lastVersionReleased'] + ".")
                                                         for (var key in Removed) {
                                                             var value = Removed[key];
                                                             botManager.updateConsole('   - ' + key + ' (' + value + ')');
                                                             botManager.sendToChannels('pmmp', '   - ' + key + ' (' + value + ')')
-                                                            fixedText = fixedText + "    - " + key + " (" + value + ")"
+                                                            fixedText = fixedText + "\n" + "    - " + key + " (" + value + ")"
                                                         }
                                                     } else {
-                                                        console.log('There is no packets removed');
-                                                        botManager.updateConsole('\nThere is no packets removed');
-                                                        botManager.sendToChannels('pmmp', 'There is no packets removed in ' + botManager.config['lastVersionReleased'])
-                                                        fixedText = fixedText + "\n" + "There is no packets removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] : botManager.config["lastVersionAndroid2"]);
+                                                        console.log('There are no packets removed');
+                                                        botManager.updateConsole('\nThere are no packets removed');
+                                                        botManager.sendToChannels('pmmp', 'There are no packets removed in ' + botManager.config['lastVersionReleased'] + ".")
+                                                        fixedText = fixedText + "\n" + "There are no packets removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
                                                     }
 
 
@@ -279,10 +278,16 @@ class Decompiler {
 
                                                     botManager.saveConfig()
 
+                                                    console.log(botManager.config["lastVersionReleasedIsBeta"] ? "Found " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "Found " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
+                                                    console.log("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs")
+
+                                                    botManager.updateConsole(botManager.config["lastVersionReleasedIsBeta"] ? "\nFound " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "\nFound " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
+                                                    botManager.updateConsole("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs" + ".")
+
+
                                                     console.log('Authentificating to github');
 
                                                     var githubClient = github.client(botManager.config['githubToken']);
-
 
                                                     var toFilter = secondPart.split('\n');
 
@@ -298,22 +303,133 @@ class Decompiler {
 
 
                                                     console.log('Posting on github the protocol documentation..');
-
-                                                    githubClient.repo('MisteFr/minecraft-protocol-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + ".md" : "release/" + botManager.config["lastVersionAndroid"] + ".md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding protocol bump from " + botManager.config["lastVersionAndroidBeta"] : "Adding protocol bump from " + botManager.config["lastVersionAndroid"]), fixedText, (err, data) => {
+                                                    githubClient.repo('MisteFr/minecraft-protocol-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + ".md" : "release/" + botManager.config["lastVersionAndroid"] + ".md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding protocol bump from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding protocol bump from " + botManager.config["lastVersionAndroid"] + "."), fixedText, (err, data) => {
                                                         if (err) {
                                                             botManager.updateConsole('\nError while trying to update the protocol documentation of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
                                                             return console.error(err);
                                                         }
                                                         console.log(data.content.html_url);
-                                                        botManager.sendToChannels('pmmp', 'Uploaded the protocol documentation of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url)
-                                                        botManager.channelToDebugMcpe.send('Uploaded the protocol documentation of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url)
+                                                        botManager.sendToChannels('pmmp', 'Uploaded the protocol documentation of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url + ".")
+                                                        botManager.channelToDebugMcpe.send('Uploaded the protocol documentation of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url + ".")
                                                     });
 
-                                                    console.log(botManager.config["lastVersionReleasedIsBeta"] ? "Found " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "Found " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
-                                                    console.log("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs")
 
-                                                    botManager.updateConsole(botManager.config["lastVersionReleasedIsBeta"] ? "\nFound " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "\nFound " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
-                                                    botManager.updateConsole("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs")
+                                                    console.log("Extracting symbols of this version")
+
+                                                    exec(botManager.config["lastVersionReleasedIsBeta"] ? "readelf -Ws MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "readelf -Ws MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 2048 * 10000 }, (err, stdout, stderr) => {
+                                                        if (err) {
+                                                            console.log(err.message)
+                                                            return;
+                                                        }
+
+                                                        var newSymbolArrayNameToAddress = [];
+                                                        var newSymbolList = (stdout.split("Ndx Name")[1]).split("\n");
+
+                                                        newSymbolList.forEach(function (element) {
+                                                            var subArray = botManager.cleanArray((element.split(" ")));
+                                                            if (subArray[7] !== undefined && subArray[1] !== undefined) {
+                                                                newSymbolArrayNameToAddress[subArray[7]] = subArray[1].toString();
+                                                            }
+                                                        })
+
+
+                                                        var oldSymbolArrayNameToAddress = [];
+                                                        if (botManager.config["lastVersionReleasedIsBeta"] === true) {
+                                                            var oldSymbolList = (botManager.config["symbolsListBeta"].split("Ndx Name")[1]).split("\n");
+                                                        } else {
+                                                            var oldSymbolList = (botManager.config["symbolsListRelease"].split("Ndx Name")[1]).split("\n");
+                                                        }
+
+                                                        oldSymbolList.forEach(function (element) {
+                                                            var subArray = botManager.cleanArray((element.split(" ")));
+                                                            if (subArray[7] !== undefined && subArray[1] !== undefined) {
+                                                                oldSymbolArrayNameToAddress[subArray[7]] = subArray[1].toString();
+                                                            }
+                                                        })
+
+
+                                                        var Added = [];
+                                                        var someAdded = false;
+
+                                                        for (var element in newSymbolArrayNameToAddress) {
+                                                            if (!oldSymbolArrayNameToAddress.hasOwnProperty(element)) {
+                                                                Added[element] = newSymbolArrayNameToAddress[element];
+                                                                someAdded = true;
+                                                            }
+                                                        }
+
+                                                        var Removed = [];
+                                                        var someRemoved = false;
+
+                                                        for (var element in oldSymbolArrayNameToAddress) {
+                                                            if (!newSymbolArrayNameToAddress.hasOwnProperty(element)) {
+                                                                Removed[element] = oldSymbolArrayNameToAddress[element];
+                                                                someRemoved = true;
+                                                            }
+                                                        }
+
+                                                        var textToPublish = "";
+
+                                                        if (someRemoved !== false || someAdded !== false) {
+                                                            if (someAdded === true) {
+                                                                textToPublish = textToPublish + "\n" + "There are some new symbols added in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                                console.log('Found new symbols !');
+                                                                console.log(Added)
+                                                                textToPublish = textToPublish + "\n" + "```";
+                                                                for (var key in Added) {
+                                                                    var value = Added[key];
+                                                                    textToPublish = textToPublish + "\n" + "    - " + key + " (Address: " + value + ")"
+                                                                }
+                                                                textToPublish = textToPublish + "\n" + "```";
+                                                            } else {
+                                                                textToPublish = textToPublish + "\n" + "There are no symbols added in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                            }
+
+                                                            if (someRemoved === true) {
+                                                                textToPublish = textToPublish + "\n" + "There are some new symbols removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                                console.log('Found new symbols !');
+                                                                console.log(Added)
+                                                                textToPublish = textToPublish + "\n" + "```";
+                                                                for (var key in Added) {
+                                                                    var value = Added[key];
+                                                                    textToPublish = textToPublish + "\n" + "    - " + key + " (Address: " + value + ")"
+                                                                }
+                                                                textToPublish = textToPublish + "\n" + "```";
+                                                            } else {
+                                                                textToPublish = textToPublish + "\n" + "There are no symbols removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                            }
+                                                        } else {
+                                                            textToPublish = textToPublish + "\n" + "There are no symbols added and removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                        }
+
+
+                                                        githubClient.repo('MisteFr/minecraft-symbols-dumps').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "_dump.md" : "release/" + botManager.config["lastVersionAndroid"] + "_dump.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding symbols bump from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding symbols bump from " + botManager.config["lastVersionAndroid"] + "."), stdout, (err, data) => {
+                                                            if (err) {
+                                                                botManager.updateConsole('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
+                                                                return console.error(err);
+                                                            } else {
+                                                                console.log(data.content.html_url);
+                                                                githubClient.repo('MisteFr/minecraft-symbols-dumps').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + ".md" : "release/" + botManager.config["lastVersionAndroid"] + ".md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding symbols diff from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding symbols diff from " + botManager.config["lastVersionAndroid"] + "."), textToPublish, (err, data) => {
+                                                                    if (err) {
+                                                                        botManager.updateConsole('\nError while trying to update the symbols infos of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
+                                                                        return console.error(err);
+                                                                    }
+                                                                    console.log(data.content.html_url);
+                                                                    botManager.sendToChannels('pmmp', 'Uploaded the symbols diff & symbol dump of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url)
+                                                                    botManager.channelToDebugMcpe.send('Uploaded the symbols diff & symbol dump of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url)
+                                                                });
+                                                            }
+                                                        });
+
+                                                        if (botManager.config["lastVersionReleasedIsBeta"] === true) {
+                                                            botManager.config["symbolsListBeta"] = stdout;
+                                                        } else {
+                                                            botManager.config["symbolsListRelease"] = stdout;
+                                                        }
+
+                                                        botManager.saveConfig()
+
+                                                    })
                                                 });
                                             });
                                         }
