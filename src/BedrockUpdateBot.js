@@ -92,7 +92,7 @@ Bot.on('message', message => {
       if (message.mentions !== undefined) {
         if (message.mentions.channels !== undefined) {
           var nameOfTheChannel = message.mentions.channels.first().name;
-          if (message.author.id === message.guild.ownerID) {
+          if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
             var objectToSave = {}
             objectToSave[nameOfTheChannel] = ["news"];
             botManager.config['channels'][message.guild.id] = [objectToSave];
@@ -102,7 +102,7 @@ Bot.on('message', message => {
             botManager.saveConfig()
             return true;
           } else {
-            message.reply("Only the owner of the discord server can set the channel.")
+            message.reply("Only the admins of this discord server can set the channel.")
           }
         }
       }
