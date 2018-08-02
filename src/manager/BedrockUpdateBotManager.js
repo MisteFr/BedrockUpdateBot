@@ -54,16 +54,6 @@ class BedrockUpdateBotManager {
             this.Bot.channelsToSend.set(key, this.config["channels"][key]);
         }
 
-
-        console.log('Scheduling Tasks..')
-        let taskFolder = fs.readdirSync(path.join(__dirname, './../tasks'));
-        this.Bot.tasks = new Discord.Collection();
-        for (let file of taskFolder) {
-            let task = require('./../tasks/' + file);
-            this.Bot.tasks.set(task.getName(), [task.getDelay(), task.getDelay()]);
-        }
-        Repeat(this.taskActivator).every('1000', 'ms').start.in('1', 'sec')
-
         console.log("Checking for servers joined when the bot was offline..")
         var i = 0;
         this.Bot.guilds.forEach(guild => {
@@ -92,6 +82,15 @@ class BedrockUpdateBotManager {
         })
 
         console.log("Removed from " + i + " servers.")
+
+        console.log('Scheduling Tasks..')
+        let taskFolder = fs.readdirSync(path.join(__dirname, './../tasks'));
+        this.Bot.tasks = new Discord.Collection();
+        for (let file of taskFolder) {
+            let task = require('./../tasks/' + file);
+            this.Bot.tasks.set(task.getName(), [task.getDelay(), task.getDelay()]);
+        }
+        Repeat(this.taskActivator).every('1000', 'ms').start.in('1', 'sec')
 
         console.log('I am ready!');
     }
@@ -132,6 +131,18 @@ class BedrockUpdateBotManager {
                 }
             }
         });
+        if (type === "news") {
+            botManager.config['waitingForFinalRegister'].forEach(function (element) {
+                var guild = botManager.Bot.guilds.get(element)
+                if (guild !== undefined) {
+                    botManager.getDefaultChannel(guild)
+                        .then(function (channel) {
+                            channel.send(toSend)
+                            channel.send("Hey <@" + guild.ownerID + "> !\nYou didnt set any channel for me to post in so I posted in the first channel I found :(.\nYou can fix this problem by answering to this message 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
+                        })
+                }
+            })
+        }
     }
 
 
@@ -189,12 +200,12 @@ class BedrockUpdateBotManager {
     cleanArray(actual) {
         var newArray = new Array();
         for (var i = 0; i < actual.length; i++) {
-          if (actual[i]) {
-            newArray.push(actual[i]);
-          }
+            if (actual[i]) {
+                newArray.push(actual[i]);
+            }
         }
         return newArray;
-      }
+    }
 
     sleep(sleepDuration) {
         var now = new Date().getTime();
