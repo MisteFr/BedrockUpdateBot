@@ -85,25 +85,22 @@ Bot.on("channelDelete", channel => {
 
 
 Bot.on('message', message => {
-
   if (message.guild !== null && message.author.username !== "BedrockUpdateBot") {
     if (botManager.config["waitingForFinalRegister"].includes(message.guild.id) && message.content.includes('The channel I chose is') && !message.content.includes('Thanks for')) {
 
-      if (message.mentions !== undefined) {
-        if (message.mentions.channels !== undefined) {
-          var nameOfTheChannel = message.mentions.channels.first().name;
-          if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
-            var objectToSave = {}
-            objectToSave[nameOfTheChannel] = ["news"];
-            botManager.config['channels'][message.guild.id] = [objectToSave];
-            botManager.Bot.channelsToSend.set(message.guild.id, botManager.config["channels"][message.guild.id]);
-            message.reply("Correctly setted up the bot for this discord server !\nYou will now receive all the Minecraft & Minecraft Bedrock latest news on the channel " + nameOfTheChannel + ".")
-            botManager.config["waitingForFinalRegister"] = botManager.config["waitingForFinalRegister"].filter(item => item !== message.guild.id)
-            botManager.saveConfig()
-            return true;
-          } else {
-            message.reply("Only the admins of this discord server can set the channel.")
-          }
+      if (message.mentions.channels.size === 1) {
+        var nameOfTheChannel = message.mentions.channels.first().name;
+        if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
+          var objectToSave = {}
+          objectToSave[nameOfTheChannel] = ["news"];
+          botManager.config['channels'][message.guild.id] = [objectToSave];
+          botManager.Bot.channelsToSend.set(message.guild.id, botManager.config["channels"][message.guild.id]);
+          message.reply("Correctly setted up the bot for this discord server !\nYou will now receive all the Minecraft & Minecraft Bedrock latest news on the channel " + nameOfTheChannel + ".")
+          botManager.config["waitingForFinalRegister"] = botManager.config["waitingForFinalRegister"].filter(item => item !== message.guild.id)
+          botManager.saveConfig()
+          return true;
+        } else {
+          message.reply("Only the admins of this discord server can set the channel.")
         }
       }
 
