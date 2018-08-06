@@ -5,7 +5,7 @@ var BedrockUpdateBotManager = require('./manager/BedrockUpdateBotManager');
 
 global.botManager = new BedrockUpdateBotManager()
 
-Bot.login(botManager.config["botToken"]);
+Bot.login(botManager.loginConfig["botToken"]);
 
 Bot.on('ready', () => {
   botManager.init(Bot)
@@ -151,56 +151,6 @@ Bot.on('message', message => {
     message.react("🇽")
   }
   var args = message.content.split(" ").slice(1);
-
-  if (message.author.username == "MCPE Google Play Updates" && message.channel.name == "updates") {
-    if (message.content.includes("APK file now available for com.mojang.minecraftpe " + botManager.config["lastVersionReleased"]) && message.content.includes("arm")) {
-      require('./decompiler/Decompiler.js').checkMessage(message);
-    }
-  }
-
-  if (message.author.username == "MCPE Google Play Updates" && message.embeds[0] !== undefined) {
-    if (message.embeds[0].title !== botManager.config["lastVersionAndroid"] && (message.embeds[0].title.replace(/[-)(]/g, '')).replace(/[- )(]/g, '_') !== botManager.config["lastVersionAndroidBeta"] && typeof message.embeds[0].description === undefined) {
-      console.log(message.embeds[0].title);
-
-      if (message.embeds[0].title.includes("(beta)")) {
-        Bot.users.forEach(function (element) {
-          if (element.id == botManager.config['ownerId']) {
-            element.send("A new version is out on the GooglePlayStore for beta users ! (" + message.embeds[0].title + ")")
-          }
-        });
-        botManager.config["lastVersionAndroidBeta2"] = botManager.config["lastVersionAndroidBeta"];
-        botManager.config["lastVersionAndroidBeta"] = (message.embeds[0].title.replace(/[-)(]/g, '')).replace(/[- )(]/g, '_');
-        botManager.config["lastVersionReleased"] = (message.embeds[0].title.replace("(beta)", "")).replace(/\s/g, '');
-        botManager.config["lastVersionReleasedIsBeta"] = true;
-        botManager.saveConfig()
-        var embed = new Discord.RichEmbed()
-          .setTitle(`A new version is out on the Google Play Store for beta users: ` + message.embeds[0].title + " :pushpin:")
-          .setColor('#0941a9')
-          .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-        botManager.sendToChannels('news', embed)
-        botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore for beta users! (" + message.embeds[0].title + ") ")
-        botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store for beta users: ' + botManager.config["lastVersionAndroidBeta"] + " !\n\n#RT" }, function (error, tweet, response) { });
-      } else if (message.embeds[0].title.match(/^[0-9. ]+$/) != null) {
-        Bot.users.forEach(function (element) {
-          if (element.id == botManager.config['ownerId']) {
-            element.send("A new version is out on the GooglePlayStore ! (" + message.embeds[0].title + ")");
-          }
-        });
-        botManager.config["lastVersionAndroid2"] = botManager.config["lastVersionAndroid"];
-        botManager.config["lastVersionAndroid"] = message.embeds[0].title;
-        botManager.config["lastVersionReleased"] = message.embeds[0].title;
-        botManager.config["lastVersionReleasedIsBeta"] = false;
-        botManager.saveConfig()
-        var embed = new Discord.RichEmbed()
-          .setTitle(`A new version is out on the Google Play Store: ` + botManager.config["lastVersionAndroid"] + " :pushpin:")
-          .setColor('#0941a9')
-          .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-        botManager.sendToChannels('news', embed)
-        botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + message.embeds[0].title + ") ")
-        botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store: ' + botManager.config["lastVersionAndroid"] + " !\n\n#RT" }, function (error, tweet, response) { });
-      }
-    }
-  }
 
   if (!message.content.startsWith('>') || message.author.bot) return;
   let realargs = message.content.slice('>'.length).split(/ +/);

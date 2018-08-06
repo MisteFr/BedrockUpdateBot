@@ -16,9 +16,7 @@ class CheckCommand{
     static executeCommand(message) {
         let args = message.content.split(">check ");
         if (args[1] !== null) {
-            botManager.channelToDebugMcpe.fetchMessage(args[1])
-                .then(message => botManager.checkMessage(message))
-                .catch(console.error);
+            require('./../deassembly/Deassembly.js').run(args[1]);
         }
     }
 }

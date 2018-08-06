@@ -1,4 +1,6 @@
 MCPE/
 node_modules/
 packets.py
+entityIds.py
 config.yml
+login.yml
