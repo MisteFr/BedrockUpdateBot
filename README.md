@@ -12,7 +12,7 @@ List of supported news:
   
  You can now **add this bot to your server** following link: https://discordapp.com/oauth2/authorize?client_id=410839949802209280&scope=bot&permissions=36707392.
 
- ## Decompilation
+ ## Deassembly
 
  When a new release or beta is available on the Google PlayStore, the bot is automatically saving it and then doing some deassembly on using objdump to get the protocol changes, the entity ids list of the version and the symbols list to do some diffs on.
 
