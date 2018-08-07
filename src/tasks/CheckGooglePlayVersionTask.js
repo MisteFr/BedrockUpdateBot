@@ -38,8 +38,6 @@ class CheckGooglePlayVersionTask {
                 var betaVersionCode = res[0].details.appDetails.versionCode;
 
                 if ((betaVersion + "_beta") !== botManager.config["lastVersionAndroidBeta"] && (betaVersion + "_beta") !== botManager.config["lastVersionAndroidBeta2"]) {
-                    fs.mkdirSync("MCPE/Beta/" + betaVersion + "_beta/")
-                    var fStream = fs.createWriteStream("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.apk");
                     console.log("betaVersion: " + betaVersion)
                     botManager.config["lastVersionAndroidBeta2"] = botManager.config["lastVersionAndroidBeta"];
                     botManager.config["lastVersionAndroidBeta"] = (betaVersion + "_beta");
@@ -62,11 +60,17 @@ class CheckGooglePlayVersionTask {
 
                     botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store for beta users: ' + betaVersion + " !\n\n#RT" }, function (error, tweet, response) { });
 
+                    fs.mkdirSync("MCPE/Beta/" + betaVersion + "_beta/")
+                    var fStream = fs.createWriteStream("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.apk");
+                    
                     fStream.on('open', function () {
                         betaAccount.download("com.mojang.minecraftpe", betaVersionCode).then(function (res) {
                             res.pipe(fStream);
-                            require('./../deassembly/Deassembly.js').run(betaVersion);
                         });
+                    })
+
+                    fStream.on('finish', function () {
+                        require('./../deassembly/Deassembly.js').run(betaVersion);
                     })
                 }
             } else {
@@ -87,8 +91,6 @@ class CheckGooglePlayVersionTask {
                 var normalVersionCode = res[0].details.appDetails.versionCode;
 
                 if (normalVersion !== botManager.config["lastVersionAndroid"] && normalVersion !== botManager.config["lastVersionAndroid2"]) {
-                    fs.mkdirSync("MCPE/Release/" + betaVersion + "/")
-                    var fStream = fs.createWriteStream("MCPE/Release/" + normalVersion + "/" + normalVersion + ".apk");
                     console.log("normalVersion: " + normalVersion)
                     botManager.config["lastVersionAndroid2"] = botManager.config["lastVersionAndroid"];
                     botManager.config["lastVersionAndroid"] = normalVersion;
@@ -102,18 +104,24 @@ class CheckGooglePlayVersionTask {
                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                     botManager.sendToChannels('news', embed)
                     botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + body["Android"]["Version"] + ") ")
-                    Bot.users.forEach(function (element) {
+                    botManager.Bot.users.forEach(function (element) {
                         if (element.id == botManager.config['ownerId']) {
                             element.send(embed);
                         }
                     });
                     botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store: ' + normalVersion + " !\n\n#RT" }, function (error, tweet, response) { });
 
+                    fs.mkdirSync("MCPE/Release/" + normalVersion + "/")
+                    var fStream = fs.createWriteStream("MCPE/Release/" + normalVersion + "/" + normalVersion + ".apk");
+
                     fStream.on('open', function () {
-                        normalAccount.download("com.mojang.minecraftpe", normalVersionCode).then(function (res) {
+                        betaAccount.download("com.mojang.minecraftpe", normalVersionCode).then(function (res) {
                             res.pipe(fStream);
-                            require('./../deassembly/Deassembly.js').run(normalVersion);
                         });
+                    })
+
+                    fStream.on('finish', function () {
+                        require('./../deassembly/Deassembly.js').run(normalVersion);
                     })
                 }
             } else {

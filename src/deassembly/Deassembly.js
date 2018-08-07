@@ -250,13 +250,6 @@ class Deassembly {
 
                                     botManager.saveConfig()
 
-                                    console.log(botManager.config["lastVersionReleasedIsBeta"] ? "Found " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "Found " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
-                                    console.log("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs")
-
-                                    botManager.updateConsole(botManager.config["lastVersionReleasedIsBeta"] ? "\nFound " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "\nFound " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
-                                    botManager.updateConsole("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs" + ".")
-
-
                                     console.log('Authentificating to github');
 
                                     var githubClient = github.client(botManager.loginConfig['githubToken']);
@@ -275,6 +268,7 @@ class Deassembly {
 
 
                                     console.log('Posting on github the protocol documentation..');
+
                                     githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_protocol.md" : "release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_protocol.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding protocol bump from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding protocol documentation from " + botManager.config["lastVersionAndroid"] + "."), fixedText, (err, data) => {
                                         if (err) {
                                             botManager.updateConsole('\nError while trying to update the protocol documentation of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
@@ -360,11 +354,11 @@ class Deassembly {
 
                                             if (someRemoved === true) {
                                                 infoText = infoText + "There are some new symbols removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
-                                                console.log('Found new symbols !');
-                                                console.log(Added)
+                                                console.log('Found removed symbols !');
+                                                console.log(Removed)
                                                 infoText = infoText + "\n" + "```";
-                                                for (var key in Added) {
-                                                    var value = Added[key];
+                                                for (var key in Removed) {
+                                                    var value = Removed[key];
                                                     infoText = infoText + "\n" + "    - " + key + " (Address: " + value + ")"
                                                 }
                                                 infoText = infoText + "\n" + "```";
@@ -394,7 +388,7 @@ class Deassembly {
 
                                         console.log("Extracting entity ids list")
 
-                                        exec(botManager.config["lastVersionReleasedIsBeta"] ? "python entityIds.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python packets.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 500 }, (err, stdout, stderr) => {
+                                        exec(botManager.config["lastVersionReleasedIsBeta"] ? "python entityIds.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python entityIds.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 500 }, (err, stdout, stderr) => {
                                             if (err) {
                                                 console.log(err.message)
                                                 return;
@@ -476,11 +470,12 @@ class Deassembly {
                                                             return console.error("error" + err);
                                                         }
                                                         console.log(data.content.html_url);
-                                                        botManager.sendToChannels('pmmp', 'Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url + ".")
-                                                        botManager.channelToDebugMcpe.send('Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url + ".")
+                                                        botManager.sendToChannels('pmmp', 'Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url)
+                                                        botManager.channelToDebugMcpe.send('Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' here: ' + data.content.html_url)
                                                     });
                                                 }
                                             });
+
 
                                             if (botManager.config["lastVersionReleasedIsBeta"] === true) {
                                                 botManager.config["entityIdListBeta"] = stdout;
@@ -489,6 +484,12 @@ class Deassembly {
                                             }
 
                                             botManager.saveConfig()
+
+                                            console.log(botManager.config["lastVersionReleasedIsBeta"] ? "Found " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "Found " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
+                                            console.log("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs")
+
+                                            botManager.updateConsole(botManager.config["lastVersionReleasedIsBeta"] ? "\nFound " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "\nFound " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
+                                            botManager.updateConsole("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs" + ".")
                                         })
                                     })
                                 });
@@ -497,7 +498,7 @@ class Deassembly {
 
                     }
                 });
-            }else{
+            } else {
                 console.log("I found the folder but no the file.")
                 botManager.Bot.users.forEach(function (element) {
                     if (element.id == botManager.config['ownerId']) {
@@ -505,7 +506,7 @@ class Deassembly {
                     }
                 });
             }
-        }else{
+        } else {
             console.log("I didnt find the folder.")
             botManager.Bot.users.forEach(function (element) {
                 if (element.id == botManager.config['ownerId']) {
