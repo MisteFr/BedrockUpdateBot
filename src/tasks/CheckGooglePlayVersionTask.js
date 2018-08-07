@@ -70,7 +70,7 @@ class CheckGooglePlayVersionTask {
                     })
 
                     fStream.on('finish', function () {
-                        require('./../deassembly/Deassembly.js').run(betaVersion);
+                        require('./../disassembly/Disassembly.js').run(betaVersion);
                     })
                 }
             } else {
@@ -121,7 +121,7 @@ class CheckGooglePlayVersionTask {
                     })
 
                     fStream.on('finish', function () {
-                        require('./../deassembly/Deassembly.js').run(normalVersion);
+                        require('./../disassembly/Disassembly.js').run(normalVersion);
                     })
                 }
             } else {

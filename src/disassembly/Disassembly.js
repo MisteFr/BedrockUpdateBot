@@ -7,7 +7,7 @@ const JsDiff = require('diff');
 const github = require('octonode');
 
 
-class Deassembly {
+class Disassembly {
 
     static run(version) {
         if (fs.existsSync(botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + version + "_beta" : "MCPE/Release/" + version)) {
@@ -57,7 +57,7 @@ class Deassembly {
                                     for (var i = 0; i < PacketArray.length; ++i) {
                                         PacketArray[i] = ((PacketArray[i].replace(/(\r\n|\n|\r)/gm, "")).replace(/\s/g, '')).replace(";", "");
                                     }
-                                    var packetCount = (i - 1);
+                                    var packetCount = (i - 2);
                                     PacketArray = PacketArray.filter(v => v != '');
 
                                     console.log('Comparing the packet list with the latest packet list ' + (botManager.config["lastVersionReleasedIsBeta"] ? "coming from the beta " + botManager.config["lastVersionAndroidBeta2"] + " because this version is a beta version." : "coming from the release " + botManager.config["lastVersionAndroid2"] + " because this version is a release version."));
@@ -517,4 +517,4 @@ class Deassembly {
     }
 }
 
-module.exports = Deassembly;
+module.exports = Disassembly;

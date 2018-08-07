@@ -162,11 +162,6 @@ class BedrockUpdateBotManager {
         yaml_config.writeSync("./../../login.yml", this.loginConfig)
     }
 
-
-    checkMessage(message) {
-        require('./../deassembly/Deassembly.js').checkMessage(message);
-    }
-
     createNewConsoleMessage() {
         this.channelToDebugMcpe.send("```\nCONSOLE```")
         this.LastContent = "\nCONSOLE\n";
