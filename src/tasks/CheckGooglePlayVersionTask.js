@@ -1,7 +1,6 @@
 require('./../BedrockUpdateBot.js')
 const Discord = require('discord.js');
 const fs = require('fs');
-var btoa = require('btoa')
 
 class CheckGooglePlayVersionTask {
     static getDelay() {
@@ -58,11 +57,9 @@ class CheckGooglePlayVersionTask {
                         }
                     });
 
-                    botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store for beta users: ' + betaVersion + " !\n\n#RT" }, function (error, tweet, response) { });
-
                     fs.mkdirSync("MCPE/Beta/" + betaVersion + "_beta/")
                     var fStream = fs.createWriteStream("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.apk");
-                    
+
                     fStream.on('open', function () {
                         betaAccount.download("com.mojang.minecraftpe", betaVersionCode).then(function (res) {
                             res.pipe(fStream);
@@ -72,15 +69,14 @@ class CheckGooglePlayVersionTask {
                     fStream.on('finish', function () {
                         require('./../disassembly/Disassembly.js').run(betaVersion);
                     })
+
+                    betaAccount.details("com.mojang.minecraftpe", function (err, res) {
+                        var configStream = fs.createWriteStream("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.json");
+                        configStream.on('open', function () {
+                            fs.writeFile("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.json", JSON.stringify(res, null, 4), 'utf8', function foo() {});
+                        })
+                    })
                 }
-            } else {
-                Bot.users.forEach(function (element) {
-                    if (element.id == botManager.config['ownerId']) {
-                        element.send("Request failed beta ?")
-                        console.log(res)
-                        console.log(err)
-                    }
-                });
             }
         });
 
@@ -123,15 +119,14 @@ class CheckGooglePlayVersionTask {
                     fStream.on('finish', function () {
                         require('./../disassembly/Disassembly.js').run(normalVersion);
                     })
+
+                    normalAccount.details("com.mojang.minecraftpe", function (err, res) {
+                        var configStream = fs.createWriteStream("MCPE/Release/" + normalVersion + "/" + normalVersion + ".json");
+                        configStream.on('open', function () {
+                            fs.writeFile("MCPE/Release/" + betaVersion + "/" + betaVersion + ".json", JSON.stringify(res, null, 4), 'utf8', function foo() {});
+                        })
+                    })
                 }
-            } else {
-                Bot.users.forEach(function (element) {
-                    if (element.id == botManager.config['ownerId']) {
-                        element.send("Request failed ? normal")
-                        console.log(res)
-                        console.log(err)
-                    }
-                });
             }
         });
     }
