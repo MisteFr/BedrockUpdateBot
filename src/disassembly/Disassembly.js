@@ -413,11 +413,17 @@ class Disassembly {
                                                 diff.forEach(function (part) {
                                                     if (part.added !== undefined || part.removed !== undefined) {
                                                         if (part.added !== undefined && part.value !== undefined) {
-                                                            smthAdded = true;
-                                                            Added[(part.value.split("=")[0])] = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
+                                                            var s = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
+                                                            if(!isNaN(s) && (s.length - s.replace(/[A-Z]/g, '').length) > 1){
+                                                                smthAdded = true;
+                                                                Added[(part.value.split("=")[0])] = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
+                                                            }
                                                         } else if (part.removed !== undefined && part.value !== undefined) {
-                                                            smthRemoved = true;
-                                                            Removed[(part.value.split("=")[0])] = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
+                                                            var s = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
+                                                            if(!isNaN(s) && (s.length - s.replace(/[A-Z]/g, '').length) > 1){
+                                                                smthRemoved = true;
+                                                                Removed[(part.value.split("=")[0])] = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
+                                                            }
                                                         }
                                                     }
                                                 });

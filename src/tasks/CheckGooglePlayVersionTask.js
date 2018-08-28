@@ -99,7 +99,7 @@ class CheckGooglePlayVersionTask {
                         .setColor('#0941a9')
                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                     botManager.sendToChannels('news', embed)
-                    botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + body["Android"]["Version"] + ") ")
+                    botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + botManager.config["lastVersionAndroid"] + ") ")
                     botManager.Bot.users.forEach(function (element) {
                         if (element.id == botManager.config['ownerId']) {
                             element.send(embed);
@@ -123,7 +123,7 @@ class CheckGooglePlayVersionTask {
                     normalAccount.details("com.mojang.minecraftpe", function (err, res) {
                         var configStream = fs.createWriteStream("MCPE/Release/" + normalVersion + "/" + normalVersion + ".json");
                         configStream.on('open', function () {
-                            fs.writeFile("MCPE/Release/" + betaVersion + "/" + betaVersion + ".json", JSON.stringify(res, null, 4), 'utf8', function foo() {});
+                            fs.writeFile("MCPE/Release/" + normalVersion + "/" + normalVersion + ".json", JSON.stringify(res, null, 4), 'utf8', function foo() {});
                         })
                     })
                 }
