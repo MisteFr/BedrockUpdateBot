@@ -67,7 +67,7 @@ class CheckGooglePlayVersionTask {
                     })
 
                     fStream.on('finish', function () {
-                        require('./../disassembly/Disassembly.js').run(betaVersion);
+                        require('./../disassembly/MinecraftDisassembly.js').run(betaVersion);
                     })
 
                     betaAccount.details("com.mojang.minecraftpe", function (err, res) {
@@ -117,7 +117,7 @@ class CheckGooglePlayVersionTask {
                     })
 
                     fStream.on('finish', function () {
-                        require('./../disassembly/Disassembly.js').run(normalVersion);
+                        require('./../disassembly/MinecraftDisassembly.js').run(normalVersion);
                     })
 
                     normalAccount.details("com.mojang.minecraftpe", function (err, res) {

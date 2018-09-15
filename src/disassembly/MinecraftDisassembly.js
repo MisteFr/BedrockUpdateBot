@@ -7,7 +7,7 @@ const JsDiff = require('diff');
 const github = require('octonode');
 
 
-class Disassembly {
+class MinecraftDisassembly {
 
     static run(version) {
         if (fs.existsSync(botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + version + "_beta" : "MCPE/Release/" + version)) {
@@ -25,7 +25,7 @@ class Disassembly {
                 });
 
                 zip.on('ready', () => {
-                    console.log('Entries read in the apk: ' + zip.entriesCount);
+                    console.log('Entries read in the zip: ' + zip.entriesCount);
                     for (const entry of Object.values(zip.entries())) {
                         if (entry.name == "assets/profanity_filter.wlist") {
                             if (entry.size !== botManager.config["profanityFilterSize"]) {
@@ -526,4 +526,4 @@ class Disassembly {
     }
 }
 
-module.exports = Disassembly;
+module.exports = MinecraftDisassembly;

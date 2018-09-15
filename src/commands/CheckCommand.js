@@ -16,7 +16,7 @@ class CheckCommand{
     static executeCommand(message) {
         let args = message.content.split(">check ");
         if (args[1] !== null) {
-            require('./../disassembly/Disassembly.js').run(args[1]);
+            require('./../disassembly/MinecraftDisassembly.js').run(args[1]);
         }
     }
 }

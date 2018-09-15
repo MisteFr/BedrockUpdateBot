@@ -27,8 +27,8 @@ class HelpCommand {
                     title: "Commands",
                     description: "Here are the commands available",
                     fields: [{
-                        name: ">kill",
-                        value: "Kill the bot (emergency command)"
+                        name: ">invite",
+                        value: "Get the invite link of the bot"
                     },
                     {
                         name: ">latestMc",
