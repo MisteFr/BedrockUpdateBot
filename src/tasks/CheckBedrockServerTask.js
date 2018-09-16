@@ -54,7 +54,7 @@ class CheckBedrockServerTask {
                             }
                         });
                         botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Linux is available for: ' + linuxVersion + " !\n\n#RT" }, function (error, tweet, response) { });
-                        require('./../disassembly/BedrockServerDisassembly.js').run(body[1]);
+                        require('./../disassembly/BedrockServerDisassembly.js').run(body[1], linuxVersion);
                     }
 
                 } else {
