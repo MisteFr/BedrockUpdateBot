@@ -12,7 +12,7 @@ List of supported news:
   
 The prefix used by the bot for the commands is: `>`
   
- You can now **add this bot to your server** following link: <https://discordapp.com/oauth2/authorize?client_id=410839949802209280&scope=bot&permissions=36707392>.
+ You can now **add this bot to your server** using the following link: <https://discordapp.com/oauth2/authorize?client_id=410839949802209280&scope=bot&permissions=36707392>.
 
 ## Disassembly
 
