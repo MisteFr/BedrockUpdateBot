@@ -24,18 +24,13 @@ All of the documentation is posted on GitHub here [minecraft-bedrock-documentati
 
 1) New version of MCBE available on the Google Play Store
  ![alt text](/img/exemple1.png)
-
 2) New article available on the Minecraft website
  ![alt text](/img/exemple2.png)
- 
 3) Query a MCPC or MCBE server by IP&Port
  ![alt text](/img/exemple3.png)
- 
 4) New changelog available on the feedback.minecraft.net website
  ![alt text](/img/exemple4.png)
- 
 5) New video available on the TeamMojang website
  ![alt text](/img/exemple5.png)
- 
 6) New MCPC version available
  ![alt text](/img/exemple6.png)
