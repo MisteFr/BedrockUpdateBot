@@ -35,7 +35,8 @@ class CheckBedrockServerTask {
                                 element.send(embed);
                             }
                         });
-                        botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Win10 is available for: ' + win10Version + " !\n\n#RT" }, function (error, tweet, response) { });
+                        botManager.client.post('statuses/update', {status: '📌 A new version of the BedrockServer Win10 is available for: ' + win10Version + " !\n\n#RT"}, function (error, tweet, response) {
+                        });
                     }
                     if (body[1] !== botManager.config['BSLinux']) {
                         var linuxVersion = body[1].split("bedrock-server-")[1].split(".zip")[0];
@@ -53,7 +54,8 @@ class CheckBedrockServerTask {
                                 element.send(embed);
                             }
                         });
-                        botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Linux is available for: ' + linuxVersion + " !\n\n#RT" }, function (error, tweet, response) { });
+                        botManager.client.post('statuses/update', {status: '📌 A new version of the BedrockServer Linux is available for: ' + linuxVersion + " !\n\n#RT"}, function (error, tweet, response) {
+                        });
                         require('./../disassembly/BedrockServerDisassembly.js').run(body[1], linuxVersion);
                     }
 

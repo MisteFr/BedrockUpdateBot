@@ -35,7 +35,7 @@ class MCPCCommand {
                     .addField('MOTD', body.motds.clean)
                     .addField('Ping', body.ping + " ms")
                     .setImage("https://use.gameapis.net/mc/query/banner/" + args[1] + "/night")
-                message.channel.send({ embed })
+                message.channel.send({embed})
             } else {
                 message.channel.send('Serveur offline ou inexistant')
             }

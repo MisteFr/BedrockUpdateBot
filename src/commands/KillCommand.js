@@ -14,13 +14,13 @@ class KillCommand {
     }
 
     static executeCommand(message) {
-        if(message.guild.name === "PocketMine-MP | PMMP" && !message.author.bot){
+        if (message.guild.name === "PocketMine-MP | PMMP" && !message.author.bot) {
             botManager.needConfirmation = true;
             botManager.needConfirmationAuthor = message.author.username;
             message.channel.send("Do you really want to stop this bot ?");
             message.channel.send("If yes please answer to this message ``" + message.author.username + " confirms that he wants to stop this bot``");
         }
-        
+
     }
 }
 

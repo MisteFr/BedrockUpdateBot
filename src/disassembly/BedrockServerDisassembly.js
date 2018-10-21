@@ -27,16 +27,16 @@ class BedrockServerDisassembly {
                         if (entry.name == "bedrock_server") {
                             zip.extract('bedrock_server', "MCPE/Release/" + version + "/BedrockServer/" + version, err => {
                                 zip.close();
-                                const { exec } = require('child_process');
-                                exec("readelf -Ws MCPE/Release/" + version + "/BedrockServer/" + version, { maxBuffer: 2048 * 20000 }, (err, stdout, stderr) => {
+                                const {exec} = require('child_process');
+                                exec("readelf -Ws MCPE/Release/" + version + "/BedrockServer/" + version, {maxBuffer: 2048 * 20000}, (err, stdout, stderr) => {
                                     if (err) {
                                         console.log(err.message)
                                         return;
                                     }
 
-                                    if(botManager.config["lastVersionAndroid"] === version){
+                                    if (botManager.config["lastVersionAndroid"] === version) {
                                         var comparedVersion = botManager.config["lastVersionAndroid2"];
-                                    }else{
+                                    } else {
                                         var comparedVersion = botManager.config["lastVersionAndroid"];
                                     }
 
@@ -131,7 +131,7 @@ class BedrockServerDisassembly {
                                         if (err) {
                                             botManager.updateConsole('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);
                                             return console.error(err);
-                                        }else{
+                                        } else {
                                             githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents("release/" + version + "/BedrockServer/" + version + "_info.md", "Adding symbols diffs from " + version + " Bedrock Server", infoText, (err, data) => {
                                                 if (err) {
                                                     botManager.updateConsole('\nError while trying to update the version infos  of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);

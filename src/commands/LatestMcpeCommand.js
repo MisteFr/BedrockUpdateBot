@@ -21,7 +21,7 @@ class LatestMcpeCommand {
             .setDescription("Latest release: " + botManager.config["lastVersionAndroid"] + "\nLatest beta: " + botManager.config["lastVersionAndroidBeta"])
             .setColor('#0941a9')
             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-        message.channel.send({ embed })
+        message.channel.send({embed})
     }
 }
 

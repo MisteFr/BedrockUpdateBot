@@ -36,7 +36,8 @@ class CheckTeamMojangChannelTask {
                         }
                     });
 
-                    botManager.client.post('statuses/update', { status: '📌 A new video is out: ' + body["title"] + ' !\n📲 https://www.youtube.com/watch?v=' + body["id"]["videoId"] + "\n\n#RT" }, function (error, tweet, response) { });
+                    botManager.client.post('statuses/update', {status: '📌 A new video is out: ' + body["title"] + ' !\n📲 https://www.youtube.com/watch?v=' + body["id"]["videoId"] + "\n\n#RT"}, function (error, tweet, response) {
+                    });
                 }
             }
         })

@@ -49,18 +49,18 @@ class EvalCommand {
         });
     }
 
-    static safe_eval(cmd, message){
+    static safe_eval(cmd, message) {
         return new Promise((resolve, reject) => {
-          let result;
+            let result;
             try {
                 result = eval(cmd);
-            } catch(e) {
+            } catch (e) {
                 reject(e);
                 return;
             }
             resolve(result);
         });
-      }
+    }
 }
 
 module.exports = EvalCommand;

@@ -15,7 +15,7 @@ class StopCommand {
 
     static executeCommand(message) {
         if (message.member.voiceChannel) {
-            if(botManager.voice_handler !== null){
+            if (botManager.voice_handler !== null) {
                 botManager.voice_handler.end();
             }
             message.channel.send("The music have been stopped.");

@@ -34,7 +34,8 @@ class CheckMCLauncherVersionTask {
                         .setFooter("Release time: " + (new Date(body["versions"][0]["releaseTime"])).toString())
                     botManager.sendToChannels('news', embed)
 
-                    botManager.client.post('statuses/update', { status: '📌 A new ' + body["versions"][0]["type"] + ' is out on the minecraft launcher ' + botManager.config["lastMcVersion"] + " !\n\n#RT" }, function (error, tweet, response) { });
+                    botManager.client.post('statuses/update', {status: '📌 A new ' + body["versions"][0]["type"] + ' is out on the minecraft launcher ' + botManager.config["lastMcVersion"] + " !\n\n#RT"}, function (error, tweet, response) {
+                    });
 
                 }
             }

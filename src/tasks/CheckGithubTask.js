@@ -47,7 +47,7 @@ class CheckGithubTask {
                                         .setURL("https://github.com/Hydreon/Steadfast2/commit/" + botManager.config["lastSteadfastSHA"])
                                     Bot.users.forEach(function (element) {
                                         if (element.id == botManager.config['ownerId']) {
-                                            element.send({ embed })
+                                            element.send({embed})
                                         }
                                     });
 

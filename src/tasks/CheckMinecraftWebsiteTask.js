@@ -47,7 +47,7 @@ class CheckMinecraftWebsiteTask {
                             if (err) {
                                 throw new Error(err);
                             } else {
-                                botManager.client.post('media/upload', { media: data }, function (error, media, response) {
+                                botManager.client.post('media/upload', {media: data}, function (error, media, response) {
 
                                     if (!error) {
                                         var status = {
@@ -55,7 +55,8 @@ class CheckMinecraftWebsiteTask {
                                             media_ids: media.media_id_string // Pass the media id string
                                         }
 
-                                        botManager.client.post('statuses/update', status, function (error, tweet, response) { });
+                                        botManager.client.post('statuses/update', status, function (error, tweet, response) {
+                                        });
 
                                     }
                                 });

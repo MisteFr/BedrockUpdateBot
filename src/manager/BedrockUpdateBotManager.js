@@ -30,7 +30,7 @@ class BedrockUpdateBotManager {
         this.avatarURL = Bot.user.avatarURL;
         this.username = Bot.user.username;
 
-        Bot.user.setActivity("Mojang | >help | " + this.Bot.guilds.size + " guilds", { type: ("WATCHING") });
+        Bot.user.setActivity("Mojang | >help | " + this.Bot.guilds.size + " guilds", {type: ("WATCHING")});
 
         console.log('Logging in Twitter..')
         this.client = new Twitter({
@@ -97,7 +97,6 @@ class BedrockUpdateBotManager {
 
         console.log('I am ready!');
     }
-
 
 
     /*
@@ -168,7 +167,7 @@ class BedrockUpdateBotManager {
     }
 
     updateConsole(content) {
-        this.channelToDebugMcpe.fetchMessages({ limit: 50 }).then(messages => {
+        this.channelToDebugMcpe.fetchMessages({limit: 50}).then(messages => {
             let messagesArr = messages.array();
             let messageCount = messagesArr.length;
             let i2 = 0;
@@ -216,7 +215,8 @@ class BedrockUpdateBotManager {
 
     sleep(sleepDuration) {
         var now = new Date().getTime();
-        while (new Date().getTime() < now + sleepDuration) { /* do nothing (doesnt affect the child process)*/ }
+        while (new Date().getTime() < now + sleepDuration) { /* do nothing (doesnt affect the child process)*/
+        }
     }
 
     async getDefaultChannel(guild) {

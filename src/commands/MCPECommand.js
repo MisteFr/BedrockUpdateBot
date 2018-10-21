@@ -33,7 +33,7 @@ class MCPECommand {
                     .addField('Players', body.players.online + '/' + body.players.max)
                     .addField('MOTD', body.motds.clean)
                     .addField('Version', "MCPE version " + body.version)
-                message.channel.send({ embed })
+                message.channel.send({embed})
             } else {
                 message.channel.send('Server not answering')
             }

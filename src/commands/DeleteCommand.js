@@ -24,7 +24,7 @@ class DeleteCommand {
                         if (requiredType == "news" || requiredType == "debug") {
                             var channel = botManager.Bot.guilds.get(guildId).channels.find('name', channelName);
                             if (channel !== null && channel !== undefined) {
-                                channel.fetchMessages({ limit: 100 }).then(messages => {
+                                channel.fetchMessages({limit: 100}).then(messages => {
                                     let messagesArr = messages.array();
                                     let messageCount = messagesArr.length;
                                     let i2 = 0;

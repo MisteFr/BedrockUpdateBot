@@ -1,6 +1,6 @@
 require('./../BedrockUpdateBot.js');
 
-class InviteCommand{
+class InviteCommand {
     static getName() {
         return 'invite';
     }

@@ -43,11 +43,11 @@ class MinecraftDisassembly {
                                 botManager.updateConsole(err ? 'Extract error' : 'Extracting libminecraftpe.so');
                                 zip.close();
                                 console.log('Getting the packets list');
-                                const { exec } = require('child_process');
-                                exec(botManager.config["lastVersionReleasedIsBeta"] ? "python protocol.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python protocol.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 500 }, (err, stdout, stderr) => {
+                                const {exec} = require('child_process');
+                                exec(botManager.config["lastVersionReleasedIsBeta"] ? "python protocol.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python protocol.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", {maxBuffer: 1024 * 500}, (err, stdout, stderr) => {
                                     var protocol = stdout.replace(/\s/g, '');
 
-                                    exec(botManager.config["lastVersionReleasedIsBeta"] ? "python packets.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python packets.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 500 }, (err, stdout, stderr) => {
+                                    exec(botManager.config["lastVersionReleasedIsBeta"] ? "python packets.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python packets.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", {maxBuffer: 1024 * 500}, (err, stdout, stderr) => {
                                         if (err) {
                                             console.log(err.message)
                                             return;
@@ -112,7 +112,6 @@ class MinecraftDisassembly {
                                         })
 
 
-
                                         var Removed = [];
 
 
@@ -168,7 +167,6 @@ class MinecraftDisassembly {
                                             botManager.updateConsole('\nThere are no packets removed');
                                             infoText = infoText + "There are no packets removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
                                         }
-
 
 
                                         console.log('Saving the packet list to the config');
@@ -282,7 +280,7 @@ class MinecraftDisassembly {
 
                                         console.log("Extracting symbols of this version")
 
-                                        exec(botManager.config["lastVersionReleasedIsBeta"] ? "readelf -Ws MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "readelf -Ws MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 2048 * 10000 }, (err, stdout, stderr) => {
+                                        exec(botManager.config["lastVersionReleasedIsBeta"] ? "readelf -Ws MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "readelf -Ws MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", {maxBuffer: 2048 * 10000}, (err, stdout, stderr) => {
                                             if (err) {
                                                 console.log(err.message)
                                                 return;
@@ -391,7 +389,7 @@ class MinecraftDisassembly {
 
                                             console.log("Extracting entity ids list")
 
-                                            exec(botManager.config["lastVersionReleasedIsBeta"] ? "python entityIds.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python entityIds.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 500 }, (err, stdout, stderr) => {
+                                            exec(botManager.config["lastVersionReleasedIsBeta"] ? "python entityIds.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python entityIds.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", {maxBuffer: 1024 * 500}, (err, stdout, stderr) => {
                                                 if (err) {
                                                     console.log(err.message)
                                                     return;
@@ -414,13 +412,13 @@ class MinecraftDisassembly {
                                                     if (part.added !== undefined || part.removed !== undefined) {
                                                         if (part.added !== undefined && part.value !== undefined) {
                                                             var s = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
-                                                            if(!isNaN(s) && (s.length - s.replace(/[A-Z]/g, '').length) > 1){
+                                                            if (!isNaN(s) && (s.length - s.replace(/[A-Z]/g, '').length) > 1) {
                                                                 smthAdded = true;
                                                                 Added[(part.value.split("=")[0])] = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
                                                             }
                                                         } else if (part.removed !== undefined && part.value !== undefined) {
                                                             var s = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
-                                                            if(!isNaN(s) && (s.length - s.replace(/[A-Z]/g, '').length) > 1){
+                                                            if (!isNaN(s) && (s.length - s.replace(/[A-Z]/g, '').length) > 1) {
                                                                 smthRemoved = true;
                                                                 Removed[(part.value.split("=")[0])] = ((part.value.split("=")[1]).replace(";", "")).replace("\n", "");
                                                             }

@@ -1,6 +1,6 @@
 require('./../BedrockUpdateBot.js');
 
-class CheckCommand{
+class CheckCommand {
     static getName() {
         return 'check';
     }

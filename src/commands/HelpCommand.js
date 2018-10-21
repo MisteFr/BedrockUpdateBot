@@ -30,46 +30,46 @@ class HelpCommand {
                         name: ">invite",
                         value: "Get the invite link of the bot"
                     },
-                    {
-                        name: ">latestMc",
-                        value: "Get the latest MC informations"
-                    },
-                    {
-                        name: ">latestMcpe",
-                        value: "Get the latest MCPE informations"
-                    },
-                    {
-                        name: ">listemojis",
-                        value: "Get all the emojis of the server you are in"
-                    },
-                    {
-                        name: ">mcpc <ip:port>",
-                        value: "Query a MCPC server to get infos about him"
-                    },
-                    {
-                        name: ">mcpe <ip:port>",
-                        value: "Query a MCPE server to get infos about him"
-                    },
-                    {
-                        name: ">play <youtube link>",
-                        value: "Play a youtube link"
-                    },
-                    {
-                        name: ">pause",
-                        value: "Pause the actual song"
-                    },
-                    {
-                        name: ">resume",
-                        value: "Resume the song paused"
-                    },
-                    {
-                        name: ">replay",
-                        value: "Replay the last song played"
-                    },
-                    {
-                        name: ">stop",
-                        value: "Stop the song beeing played"
-                    }
+                        {
+                            name: ">latestMc",
+                            value: "Get the latest MC informations"
+                        },
+                        {
+                            name: ">latestMcpe",
+                            value: "Get the latest MCPE informations"
+                        },
+                        {
+                            name: ">listemojis",
+                            value: "Get all the emojis of the server you are in"
+                        },
+                        {
+                            name: ">mcpc <ip:port>",
+                            value: "Query a MCPC server to get infos about him"
+                        },
+                        {
+                            name: ">mcpe <ip:port>",
+                            value: "Query a MCPE server to get infos about him"
+                        },
+                        {
+                            name: ">play <youtube link>",
+                            value: "Play a youtube link"
+                        },
+                        {
+                            name: ">pause",
+                            value: "Pause the actual song"
+                        },
+                        {
+                            name: ">resume",
+                            value: "Resume the song paused"
+                        },
+                        {
+                            name: ">replay",
+                            value: "Replay the last song played"
+                        },
+                        {
+                            name: ">stop",
+                            value: "Stop the song beeing played"
+                        }
                     ],
                     timestamp: new Date(),
                     footer: {

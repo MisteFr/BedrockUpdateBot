@@ -38,7 +38,6 @@ class CheckFeedbackWebsiteTask {
                     }
 
 
-
                     if (text2.length > 2048) {
                         var embed = new Discord.RichEmbed()
                             .setTitle(`[RELEASE] A new article is out: ` + body["Release"][0] + " :pushpin:")
@@ -66,7 +65,8 @@ class CheckFeedbackWebsiteTask {
                             element.send("[RELEASE] A new article is out on the feedback website !");
                         }
                     });
-                    botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Release"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Release"][2] + "\n\n#RT" }, function (error, tweet, response) { });
+                    botManager.client.post('statuses/update', {status: '📌 A new article is out: ' + body["Release"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Release"][2] + "\n\n#RT"}, function (error, tweet, response) {
+                    });
                 }
 
                 if (body["Beta"][0] != botManager.config["latestFeedbackArticleBeta"] && body["Beta"][0] != botManager.config["latestFeedbackArticleBeta2"] && typeof body["Beta"][0] !== 'undefined') {
@@ -86,7 +86,6 @@ class CheckFeedbackWebsiteTask {
                             text2 = text2 + body["Beta"][1][index] + "\n";
                         }
                     }
-
 
 
                     if (text2.length > 2048) {
@@ -116,7 +115,8 @@ class CheckFeedbackWebsiteTask {
                             element.send("[BETA] A new article is out on the feedback website !");
                         }
                     });
-                    botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Beta"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Beta"][2] + "\n\n#RT" }, function (error, tweet, response) { });
+                    botManager.client.post('statuses/update', {status: '📌 A new article is out: ' + body["Beta"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Beta"][2] + "\n\n#RT"}, function (error, tweet, response) {
+                    });
                 }
             }
         })

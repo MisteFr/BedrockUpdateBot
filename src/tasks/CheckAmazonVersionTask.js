@@ -36,7 +36,8 @@ class CheckAmazonVersionTask {
                                 botManager.sendToChannels('debug', "A new version is out on the AmazonStore ! (" + body["Amazon"]["Version"] + ") ")
                             }
                         });
-                        botManager.client.post('statuses/update', { status: '📌 A new version is out on the AmazonStore: ' + body["Amazon"]["Version"] + " !\n\n#RT" }, function (error, tweet, response) { });
+                        botManager.client.post('statuses/update', {status: '📌 A new version is out on the AmazonStore: ' + body["Amazon"]["Version"] + " !\n\n#RT"}, function (error, tweet, response) {
+                        });
                     }
                 }
             } else {

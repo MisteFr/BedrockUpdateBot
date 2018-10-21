@@ -26,7 +26,7 @@ class LatestMcCommand {
                     .setDescription("Latest release: " + body["latest"]["release"] + "\nLatest snapshot: " + body["latest"]["snapshot"])
                     .setColor('#0941a9')
                     .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-                message.channel.send({ embed })
+                message.channel.send({embed})
             }
         })
     }
