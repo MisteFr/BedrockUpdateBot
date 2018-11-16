@@ -10,8 +10,12 @@ const github = require('octonode');
 class BedrockServerDisassembly {
 
     static run(url, version) {
-        fs.mkdirSync("MCPE/Release/" + version)
+        botManager.isDoingDisassembly = true;
+        if (!fs.existsSync("MCPE/Release/" + version + "/")) {
+            fs.mkdirSync("MCPE/Release/" + version + "/")
+        }
         fs.mkdirSync("MCPE/Release/" + version + "/BedrockServer")
+
         var file = fs.createWriteStream("MCPE/Release/" + version + "/BedrockServer/" + version + ".zip");
         var request = https.get(url, function (response) {
             response.pipe(file);
@@ -34,9 +38,9 @@ class BedrockServerDisassembly {
                                         return;
                                     }
 
-                                    if(botManager.config["lastVersionAndroid"] === version){
+                                    if (botManager.config["lastVersionAndroid"] === version) {
                                         var comparedVersion = botManager.config["lastVersionAndroid2"];
-                                    }else{
+                                    } else {
                                         var comparedVersion = botManager.config["lastVersionAndroid"];
                                     }
 
@@ -131,7 +135,7 @@ class BedrockServerDisassembly {
                                         if (err) {
                                             botManager.updateConsole('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);
                                             return console.error(err);
-                                        }else{
+                                        } else {
                                             githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents("release/" + version + "/BedrockServer/" + version + "_info.md", "Adding symbols diffs from " + version + " Bedrock Server", infoText, (err, data) => {
                                                 if (err) {
                                                     botManager.updateConsole('\nError while trying to update the version infos  of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);
@@ -148,6 +152,7 @@ class BedrockServerDisassembly {
                                     botManager.config["BSsymbolsListRelease"] = stdout;
 
                                     botManager.saveConfig()
+                                    botManager.isDoingDisassembly = false;
                                 })
                             })
                         }

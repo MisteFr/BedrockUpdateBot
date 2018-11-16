@@ -11,13 +11,6 @@ Bot.on('ready', () => {
   botManager.init(Bot)
 });
 
-Bot.on('error', e => {
-  Bot.users.forEach(function (element) {
-    if (element.id == botManager.config['ownerId']) {
-      element.send("[ERROR] " + e.message);
-    }
-  });
-});
 
 Bot.on("guildCreate", guild => {
   guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
@@ -87,7 +80,6 @@ Bot.on("channelDelete", channel => {
 Bot.on('message', message => {
   if (message.guild !== null && message.author.username !== "BedrockUpdateBot") {
     if (botManager.config["waitingForFinalRegister"].includes(message.guild.id) && message.content.includes('The channel I chose is') && !message.content.includes('Thanks for')) {
-
       if (message.mentions.channels.size === 1) {
         var nameOfTheChannel = message.mentions.channels.first().name;
         if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {

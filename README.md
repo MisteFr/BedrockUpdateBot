@@ -1,5 +1,7 @@
 # BedrockUpdateBot
-A bot who post all the latest news concerning MCPE/MCPC on your server when they are available !
+
+A bot who post all the latest news concerning MCPE/MCPC on your server when they are available !  
+Follow the bot on [Twitter](https://twitter.com/MCBEAlerts) !  
 
 List of supported news:
   - New version of MCBE available on the AppleStore, GooglePlayStore (beta and release), AmazonStore
@@ -20,7 +22,7 @@ All is posted on github here [minecraft-bedrock-documentation](https://github.co
  
  ## Exemples
 
- 1) New version of MCBE available on the GooglePlayStore
+ 1) New version of MCBE available on the GooglePlay Store/Amazon Store
  <img src="https://github.com/MisteFr/BedrockUpdateBot/raw/master/img/exemple1.png" width="450">
  
  2) New article available on the Minecraft website
@@ -35,5 +37,7 @@ All is posted on github here [minecraft-bedrock-documentation](https://github.co
  5) New video available on the TeamMojang website
  <img src="https://github.com/MisteFr/BedrockUpdateBot/raw/master/img/exemple5.png" width="450">
  
- 6) New MCPC version available
+ 6) New MCPC version available on the launcher
  <img src="https://github.com/MisteFr/BedrockUpdateBot/raw/master/img/exemple6.png" width="450">
+ 
+  6) New featured server available

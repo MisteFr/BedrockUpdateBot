@@ -30,18 +30,15 @@ class CheckMinecraftWebsiteTask {
                         botManager.config["lastWebsiteArticle"] = element["default_tile"]["title"];
                         botManager.saveConfig()
 
-                        Bot.users.forEach(function (element) {
-                            if (element.id == botManager.config['ownerId']) {
-                                element.send("A new article is out on the minecraft website " + botManager.config["lastWebsiteArticle"])
-                            }
-                        });
                         var embed = new Discord.RichEmbed()
-                            .setTitle(`A new article is out on the Minecraft website: ` + botManager.config["lastWebsiteArticle"] + " :pushpin:")
+                            .setTitle(botManager.config["lastWebsiteArticle"] + " :pushpin:")
+                            .setDescription('**' + element["default_tile"]["sub_header"] + '**')
                             .setColor('#0941a9')
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setURL("https://minecraft.net" + element["url"])
                             .setImage(element["default_tile"]["image"]["original"]["url"])
-                        botManager.sendToChannels('news', embed)
+                            .setTimestamp(new Date((element["published_at"]) * 1000))
+
 
                         botManager.getImage(element["default_tile"]["image"]["original"]["url"], function (err, data) {
                             if (err) {
@@ -55,7 +52,9 @@ class CheckMinecraftWebsiteTask {
                                             media_ids: media.media_id_string // Pass the media id string
                                         }
 
-                                        botManager.client.post('statuses/update', status, function (error, tweet, response) { });
+                                        botManager.client.post('statuses/update', status, function (error, tweet, response) {
+                                            botManager.sendToChannels('news', embed)
+                                        });
 
                                     }
                                 });

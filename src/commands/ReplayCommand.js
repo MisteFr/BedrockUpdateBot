@@ -17,7 +17,7 @@ class ReplayCommand {
     static executeCommand(message) {
         if (message.member.voiceChannel) {
             message.member.voiceChannel.join()
-                .then(connection => { // Connection is an instance of VoiceConnection
+                .then(connection => {
                     botManager.voice_handler = connection.playStream(ytdl(botManager.array[0]));
                 })
                 .catch(console.log);

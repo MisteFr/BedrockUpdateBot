@@ -4,7 +4,7 @@ const Discord = require('discord.js');
 
 class CheckAmazonVersionTask {
     static getDelay() {
-        return 30000;
+        return 1800000;
     }
 
     static getName() {
@@ -12,7 +12,7 @@ class CheckAmazonVersionTask {
     }
 
     static check(Bot) {
-        var url = "http://145.239.168.187/LastApps.php"
+        var url = "http://145.239.47.15/LastApps.php"
         request({
             url: url,
             json: true
@@ -22,21 +22,17 @@ class CheckAmazonVersionTask {
                 if (body["Amazon"]["Version"] !== botManager.config["lastVersionAmazon"] && body["Amazon"]["Version"] !== botManager.config["lastVersionAmazon2"] && typeof body["Amazon"]["Version"] !== "undefined" && body["Amazon"]["Version"] !== null) {
                     if (!body["Amazon"]["Version"].includes("Var")) {
                         console.log(body["Amazon"]["Version"])
-                        Bot.users.forEach(function (element) {
-                            if (element.id == botManager.config['ownerId']) {
-                                element.send("A new version is out on the AmazonStore ! (" + body["Amazon"]["Version"] + ")");
-                                botManager.config["lastVersionAmazon2"] = botManager.config["lastVersionAmazon"];
-                                botManager.config["lastVersionAmazon"] = body["Amazon"]["Version"];
-                                botManager.saveConfig()
-                                var embed = new Discord.RichEmbed()
-                                    .setTitle(`A new version is out on the Amazon Store: ` + botManager.config["lastVersionAmazon"] + " :pushpin:")
-                                    .setColor('#0941a9')
-                                    .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-                                botManager.sendToChannels('news', embed)
-                                botManager.sendToChannels('debug', "A new version is out on the AmazonStore ! (" + body["Amazon"]["Version"] + ") ")
-                            }
+                        botManager.client.post('statuses/update', { status: '📌 A new version is out on the AmazonStore: ' + body["Amazon"]["Version"] + " !\n\n#RT" }, function (error, tweet, response) {
+                            botManager.config["lastVersionAmazon2"] = botManager.config["lastVersionAmazon"];
+                            var embed = new Discord.RichEmbed()
+                                .setTitle(`A new version is out on the Amazon Store: ` + botManager.config["lastVersionAmazon"] + " :pushpin:")
+                                .setColor('#0941a9')
+                                .setAuthor("BedrockUpdateBot", botManager.avatarURL)
+                            botManager.sendToChannels('news', embed)
+                            botManager.sendToChannels('debug', "A new version is out on the AmazonStore ! (" + body["Amazon"]["Version"] + ") ")
                         });
-                        botManager.client.post('statuses/update', { status: '📌 A new version is out on the AmazonStore: ' + body["Amazon"]["Version"] + " !\n\n#RT" }, function (error, tweet, response) { });
+                        botManager.config["lastVersionAmazon"] = body["Amazon"]["Version"];
+                        botManager.saveConfig()
                     }
                 }
             } else {

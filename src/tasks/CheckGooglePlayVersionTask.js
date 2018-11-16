@@ -48,16 +48,16 @@ class CheckGooglePlayVersionTask {
                         .setDescription(res[0].details.appDetails.recentChangesHtml.replace(/<br\s*\/?>/gi, ' '))
                         .setColor('#0941a9')
                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-                    botManager.sendToChannels('news', embed)
-                    botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore for beta users! (" + betaVersion + ") ")
-                    botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store for beta users: ' + betaVersion + " !\n\n#RT" }, function (error, tweet, response) { });
-                    Bot.users.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
-                            element.send(embed)
-                        }
+
+                    botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store for beta users: ' + betaVersion + " !\n\n#RT" }, function (error, tweet, response) {
+                        botManager.sendToChannels('news', embed)
+                        botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore for beta users! (" + betaVersion + ") ")
                     });
 
-                    fs.mkdirSync("MCPE/Beta/" + betaVersion + "_beta/")
+
+                    if (!fs.existsSync("MCPE/Beta/" + betaVersion + "_beta/")) {
+                        fs.mkdirSync("MCPE/Beta/" + betaVersion + "_beta/")
+                    }
                     var fStream = fs.createWriteStream("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.apk");
 
                     fStream.on('open', function () {
@@ -68,12 +68,11 @@ class CheckGooglePlayVersionTask {
 
                     fStream.on('finish', function () {
                         require('./../disassembly/MinecraftDisassembly.js').run(betaVersion);
-                    })
-
-                    betaAccount.details("com.mojang.minecraftpe", function (err, res) {
-                        var configStream = fs.createWriteStream("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.json");
-                        configStream.on('open', function () {
-                            fs.writeFile("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.json", JSON.stringify(res, null, 4), 'utf8', function foo() {});
+                        betaAccount.details("com.mojang.minecraftpe", function (err, res) {
+                            var configStream = fs.createWriteStream("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.json");
+                            configStream.on('open', function () {
+                                fs.writeFile("MCPE/Beta/" + betaVersion + "_beta/" + betaVersion + "_beta.json", JSON.stringify(res, null, 4), 'utf8', function foo() { });
+                            })
                         })
                     })
                 }
@@ -98,16 +97,15 @@ class CheckGooglePlayVersionTask {
                         .setDescription(res[0].details.appDetails.recentChangesHtml.replace(/<br\s*\/?>/gi, ' '))
                         .setColor('#0941a9')
                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-                    botManager.sendToChannels('news', embed)
-                    botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + botManager.config["lastVersionAndroid"] + ") ")
-                    botManager.Bot.users.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
-                            element.send(embed);
-                        }
-                    });
-                    botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store: ' + normalVersion + " !\n\n#RT" }, function (error, tweet, response) { });
 
-                    fs.mkdirSync("MCPE/Release/" + normalVersion + "/")
+                    botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store: ' + normalVersion + " !\n\n#RT" }, function (error, tweet, response) {
+                        botManager.sendToChannels('news', embed)
+                        botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + botManager.config["lastVersionAndroid"] + ") ")
+                    });
+
+                    if (!fs.existsSync("MCPE/Release/" + normalVersion + "/")) {
+                        fs.mkdirSync("MCPE/Release/" + normalVersion + "/")
+                    }
                     var fStream = fs.createWriteStream("MCPE/Release/" + normalVersion + "/" + normalVersion + ".apk");
 
                     fStream.on('open', function () {
@@ -123,7 +121,7 @@ class CheckGooglePlayVersionTask {
                     normalAccount.details("com.mojang.minecraftpe", function (err, res) {
                         var configStream = fs.createWriteStream("MCPE/Release/" + normalVersion + "/" + normalVersion + ".json");
                         configStream.on('open', function () {
-                            fs.writeFile("MCPE/Release/" + normalVersion + "/" + normalVersion + ".json", JSON.stringify(res, null, 4), 'utf8', function foo() {});
+                            fs.writeFile("MCPE/Release/" + normalVersion + "/" + normalVersion + ".json", JSON.stringify(res, null, 4), 'utf8', function foo() { });
                         })
                     })
                 }

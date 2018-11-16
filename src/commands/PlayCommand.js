@@ -19,11 +19,10 @@ class PlayCommand {
         ytdl.getInfo(args[1], (error, info) => {
             if (error) {
                 message.reply("You need to provide a valid link.");
-                console.log(error);
             } else {
                 if (message.member.voiceChannel) {
                     message.member.voiceChannel.join()
-                        .then(connection => { // Connection is an instance of VoiceConnection
+                        .then(connection => {
                             message.reply("I joined your channel and started to play " + args[1]);
                             botManager.array[0] = args[1];
                             botManager.voice_handler = connection.playStream(ytdl(args[1]));

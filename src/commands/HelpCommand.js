@@ -15,9 +15,7 @@ class HelpCommand {
     }
 
     static executeCommand(message) {
-        //todo
-        message.author.createDM().then(channel => {
-            return channel.send({
+        message.channel.send({
                 embed: {
                     color: 627193,
                     author: {
@@ -78,9 +76,6 @@ class HelpCommand {
                     }
                 }
             });
-        }).catch(console.error)
-
-        message.reply("I sent you a dm with all the commands !")
     }
 }
 

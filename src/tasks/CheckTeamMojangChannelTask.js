@@ -13,7 +13,7 @@ class CheckTeamMojangChannelTask {
     }
 
     static check(Bot) {
-        var url = "http://145.239.168.187/LastVideo.php"
+        var url = "http://145.239.47.15/LastVideo.php"
         request({
             url: url,
             json: true
@@ -26,17 +26,14 @@ class CheckTeamMojangChannelTask {
                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                         .setDescription("**Title**: " + body["title"] + "\n**Description**: " + body["description"] + "\n**Published at**: " + body["publishedAt"]);
                     embed.setURL("https://www.youtube.com/watch?v=" + body["id"]["videoId"])
-                    botManager.sendToChannels('news', embed)
+                    
                     botManager.config["latestVideo2"] = botManager.config["latestVideo"];
                     botManager.config["latestVideo"] = body["title"];
                     botManager.saveConfig()
-                    Bot.users.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
-                            element.send("A new video is out on TeamMojang !" + body["title"]);
-                        }
-                    });
 
-                    botManager.client.post('statuses/update', { status: '📌 A new video is out: ' + body["title"] + ' !\n📲 https://www.youtube.com/watch?v=' + body["id"]["videoId"] + "\n\n#RT" }, function (error, tweet, response) { });
+                    botManager.client.post('statuses/update', { status: '📌 A new video is out: ' + body["title"] + ' !\n📲 https://www.youtube.com/watch?v=' + body["id"]["videoId"] + "\n\n#RT" }, function (error, tweet, response) {
+                        botManager.sendToChannels('news', embed)
+                    });
                 }
             }
         })

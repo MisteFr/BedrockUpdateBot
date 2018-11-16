@@ -13,7 +13,7 @@ class CheckFeedbackWebsiteTask {
     }
 
     static check(Bot) {
-        var url = "http://145.239.168.187/PMMPBot.php"
+        var url = "http://145.239.47.15/PMMPBot.php"
         request({
             url: url,
             json: true
@@ -46,8 +46,10 @@ class CheckFeedbackWebsiteTask {
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2.substr(0, 2048))
                             .setURL("https://feedback.minecraft.net" + body["Release"][2])
-                        botManager.sendToChannels('news', embed)
-                        botManager.sendToChannels('news', "You can see the rest of the changelog on the website (too big to be displayed here).")
+                        botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Release"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Release"][2] + "\n\n#RT" }, function (error, tweet, response) {
+                            botManager.sendToChannels('news', embed)
+                            botManager.sendToChannels('news', "You can see the rest of the changelog on the website (too big to be displayed here).")
+                        });
                     } else {
                         var embed = new Discord.RichEmbed()
                             .setTitle(`A new article is out: ` + body["Release"][0] + " :pushpin:")
@@ -55,18 +57,14 @@ class CheckFeedbackWebsiteTask {
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2)
                             .setURL("https://feedback.minecraft.net" + body["Release"][2])
-                        botManager.sendToChannels('news', embed)
+                        botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Release"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Release"][2] + "\n\n#RT" }, function (error, tweet, response) {
+                            botManager.sendToChannels('news', embed)
+                        });
                     }
                     console.log(body["Release"][0]);
                     botManager.config["latestFeedbackArticleRelease2"] = botManager.config["latestFeedbackArticleRelease"];
                     botManager.config["latestFeedbackArticleRelease"] = body["Release"][0];
                     botManager.saveConfig()
-                    Bot.users.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
-                            element.send("[RELEASE] A new article is out on the feedback website !");
-                        }
-                    });
-                    botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Release"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Release"][2] + "\n\n#RT" }, function (error, tweet, response) { });
                 }
 
                 if (body["Beta"][0] != botManager.config["latestFeedbackArticleBeta"] && body["Beta"][0] != botManager.config["latestFeedbackArticleBeta2"] && typeof body["Beta"][0] !== 'undefined') {
@@ -96,8 +94,10 @@ class CheckFeedbackWebsiteTask {
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2.substr(0, 2048))
                             .setURL("https://feedback.minecraft.net" + body["Beta"][2])
-                        botManager.sendToChannels('news', embed)
-                        botManager.sendToChannels('news', "You can see the rest of the changelog on the website (too big to be displayed here).")
+                        botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Beta"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Beta"][2] + "\n\n#RT" }, function (error, tweet, response) {
+                            botManager.sendToChannels('news', embed)
+                            botManager.sendToChannels('news', "You can see the rest of the changelog on the website (too big to be displayed here).")
+                        });
                     } else {
                         var embed = new Discord.RichEmbed()
                             .setTitle(`A new article is out: ` + body["Beta"][0] + " :pushpin:")
@@ -105,18 +105,14 @@ class CheckFeedbackWebsiteTask {
                             .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2)
                             .setURL("https://feedback.minecraft.net" + body["Beta"][2])
-                        botManager.sendToChannels('news', embed)
+                            botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Beta"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Beta"][2] + "\n\n#RT" }, function (error, tweet, response) {
+                                botManager.sendToChannels('news', embed)
+                            });
                     }
                     console.log(body["Beta"][0]);
                     botManager.config["latestFeedbackArticleBeta2"] = botManager.config["latestFeedbackArticleBeta"];
                     botManager.config["latestFeedbackArticleBeta"] = body["Beta"][0];
                     botManager.saveConfig()
-                    Bot.users.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
-                            element.send("[BETA] A new article is out on the feedback website !");
-                        }
-                    });
-                    botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Beta"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Beta"][2] + "\n\n#RT" }, function (error, tweet, response) { });
                 }
             }
         })

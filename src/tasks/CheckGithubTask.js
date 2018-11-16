@@ -19,6 +19,7 @@ class CheckGithubTask {
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 if (body["commit"]["sha"] !== botManager.config["lastSteadfastSHA"]) {
+                    console.log(body["commit"]["commit"]["message"])
                     Bot.users.forEach(function (element) {
                         if (element.id == botManager.config['ownerId']) {
                             element.send("A new commit is available on Steadfast2: **" + body["commit"]["commit"]["message"] + "** (" + body["commit"]["html_url"] + ")")

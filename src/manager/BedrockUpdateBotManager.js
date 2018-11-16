@@ -29,6 +29,7 @@ class BedrockUpdateBotManager {
         this.Bot = Bot;
         this.avatarURL = Bot.user.avatarURL;
         this.username = Bot.user.username;
+        this.isDoingDisassembly = false;
 
         Bot.user.setActivity("Mojang | >help | " + this.Bot.guilds.size + " guilds", { type: ("WATCHING") });
 
@@ -106,12 +107,14 @@ class BedrockUpdateBotManager {
 
     taskActivator() {
         var Bot = exports.Bot;
-        for (var [file, value] of Bot.tasks) {
-            if (value[0] == value[1]) {
-                Bot.tasks.set(file, [value[0], 0]);
-                require('./../tasks/' + file + '.js').check(Bot);
-            } else {
-                Bot.tasks.set(file, [value[0], (value[1] + 1000)]);
+        if(!botManager.isDoingDisassembly){
+            for (var [file, value] of Bot.tasks) {
+                if (value[0] == value[1]) {
+                    Bot.tasks.set(file, [value[0], 0]);
+                    require('./../tasks/' + file + '.js').check(Bot);
+                } else {
+                    Bot.tasks.set(file, [value[0], (value[1] + 1000)]);
+                }
             }
         }
     }
@@ -128,14 +131,14 @@ class BedrockUpdateBotManager {
                             var channel = this.Bot.guilds.get(guildId).channels.find('name', channelName);
                             if (channel !== null && channel !== undefined) {
                                 channel.send(toSend)
-                                    .catch(() => function () {
-                                        this.getDefaultChannel(channel.guild)
-                                            .then(function (channelToSend) {
-                                                console.log("resent")
-                                                channelToSend.send(toSend)
-                                                channelToSend.send("Hey <@" + channel.guild.ownerID + "> !\nI don't have the perms to post in the channel '" + channel.name + "', can you give me the perms to post their ?")
-                                            })
-                                    })
+                                .catch(() => function () {
+                                    this.getDefaultChannel(channel.guild)
+                                        .then(function (channelToSend) {
+                                            console.log("resent")
+                                            channelToSend.send(toSend)
+                                            channelToSend.send("Hey <@" + channel.guild.ownerID + "> !\nI don't have the perms to post in the channel '" + channel.name + "', can you give me the perms to post their ?")
+                                        })
+                                })
                             }
                         }
                     }
