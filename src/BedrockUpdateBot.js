@@ -5,12 +5,19 @@ var BedrockUpdateBotManager = require('./manager/BedrockUpdateBotManager');
 
 global.botManager = new BedrockUpdateBotManager()
 
-Bot.login(botManager.loginConfig["botToken"]);
+Bot.login(botManager.config["botToken"]);
 
 Bot.on('ready', () => {
   botManager.init(Bot)
 });
 
+Bot.on('error', e => {
+  Bot.users.forEach(function (element) {
+    if (element.id == botManager.config['ownerId']) {
+      element.send("[ERROR] " + e.message);
+    }
+  });
+});
 
 Bot.on("guildCreate", guild => {
   guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");

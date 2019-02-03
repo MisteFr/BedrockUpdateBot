@@ -1,6 +1,5 @@
 const yaml_config = require('node-yaml');
 const config = yaml_config.readSync("./../../config.yml");
-const loginConfig = yaml_config.readSync("./../../login.yml");
 const fs = require('fs');
 const https = require('https');
 const Repeat = require('repeat');
@@ -20,7 +19,6 @@ class BedrockUpdateBotManager {
         this.needConfirmationAuthor = undefined;
         this.LastContent = undefined;
         this.config = config;
-        this.loginConfig = loginConfig;
         this.turn = 0;
     }
 
@@ -30,15 +28,23 @@ class BedrockUpdateBotManager {
         this.avatarURL = Bot.user.avatarURL;
         this.username = Bot.user.username;
         this.isDoingDisassembly = false;
+        this.isDoingMarketplaceCheck = false;
 
         Bot.user.setActivity("Mojang | >help | " + this.Bot.guilds.size + " guilds", { type: ("WATCHING") });
 
         console.log('Logging in Twitter..')
         this.client = new Twitter({
-            consumer_key: loginConfig["Twitter"]["consumer_key"],
-            consumer_secret: loginConfig["Twitter"]["consumer_secret"],
-            access_token_key: loginConfig["Twitter"]["access_token_key"],
-            access_token_secret: loginConfig["Twitter"]["access_token_secret"]
+            consumer_key: config["Twitter"]["consumer_key"],
+            consumer_secret: config["Twitter"]["consumer_secret"],
+            access_token_key: config["Twitter"]["access_token_key"],
+            access_token_secret: config["Twitter"]["access_token_secret"]
+        });
+        
+        this.hytaleClient = new Twitter({
+            consumer_key: config["hytaleTwitter"]["consumer_key"],
+            consumer_secret: config["hytaleTwitter"]["consumer_secret"],
+            access_token_key: config["hytaleTwitter"]["access_token_key"],
+            access_token_secret: config["hytaleTwitter"]["access_token_secret"]
         });
 
         this.channelToDebugMcpe = Bot.guilds.get(this.config['specialId']).channels.find('name', 'updates');
@@ -107,11 +113,21 @@ class BedrockUpdateBotManager {
 
     taskActivator() {
         var Bot = exports.Bot;
-        if(!botManager.isDoingDisassembly){
+        if (!botManager.isDoingDisassembly) {
+            if (new Date().getDay() === 2 && new Date().getHours() === 19 && new Date().getMinutes() === 0) {
+                require('./../tasks/CheckMarketplaceTask.js').check(Bot);
+            }
             for (var [file, value] of Bot.tasks) {
                 if (value[0] == value[1]) {
-                    Bot.tasks.set(file, [value[0], 0]);
-                    require('./../tasks/' + file + '.js').check(Bot);
+                    if (file === "CheckMarketplaceTask.js") {
+                        if (!this.isDoingMarketplaceCheck) {
+                            Bot.tasks.set(file, [value[0], 0]);
+                            require('./../tasks/' + file + '.js').check(Bot);
+                        }
+                    } else {
+                        Bot.tasks.set(file, [value[0], 0]);
+                        require('./../tasks/' + file + '.js').check(Bot);
+                    }
                 } else {
                     Bot.tasks.set(file, [value[0], (value[1] + 1000)]);
                 }
@@ -131,14 +147,14 @@ class BedrockUpdateBotManager {
                             var channel = this.Bot.guilds.get(guildId).channels.find('name', channelName);
                             if (channel !== null && channel !== undefined) {
                                 channel.send(toSend)
-                                .catch(() => function () {
-                                    this.getDefaultChannel(channel.guild)
-                                        .then(function (channelToSend) {
-                                            console.log("resent")
-                                            channelToSend.send(toSend)
-                                            channelToSend.send("Hey <@" + channel.guild.ownerID + "> !\nI don't have the perms to post in the channel '" + channel.name + "', can you give me the perms to post their ?")
-                                        })
-                                })
+                                    .catch(() => function () {
+                                        this.getDefaultChannel(channel.guild)
+                                            .then(function (channelToSend) {
+                                                console.log("resent")
+                                                channelToSend.send(toSend)
+                                                channelToSend.send("Hey <@" + channel.guild.ownerID + "> !\nI don't have the perms to post in the channel '" + channel.name + "', can you give me the perms to post their ?")
+                                            })
+                                    })
                             }
                         }
                     }
@@ -162,7 +178,6 @@ class BedrockUpdateBotManager {
 
     saveConfig() {
         yaml_config.writeSync("./../../config.yml", this.config)
-        yaml_config.writeSync("./../../login.yml", this.loginConfig)
     }
 
     createNewConsoleMessage() {

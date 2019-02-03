@@ -27,7 +27,7 @@ class CheckMCLauncherVersionTask {
                         .setTitle("A new " + body["versions"][0]["type"] + " is out on the Minecraft launcher " + botManager.config["lastMcVersion"] + " :pushpin:")
                         .setColor('#0941a9')
                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-                        .setFooter("Release time: " + (new Date(body["versions"][0]["releaseTime"])).toString())
+                        .setTimestamp(new Date(body["versions"][0]["releaseTime"]))
 
                     botManager.client.post('statuses/update', { status: '📌 A new ' + body["versions"][0]["type"] + ' is out on the minecraft launcher ' + botManager.config["lastMcVersion"] + " !\n\n#RT" }, function (error, tweet, response) {
                         botManager.sendToChannels('news', embed)

@@ -19,16 +19,16 @@ class CheckBedrockServerTask {
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 if (body.length === 2) {
-                    if (body[0] !== botManager.config['BSWin10']) {
+                    if (body[0] !== botManager.config['BSWin10'] && body[0] !== botManager.config['BSWin102']) {
                         var win10Version = body[0].split("bedrock-server-")[1].split(".zip")[0];
 
+                        botManager.config["BSWin102"] = botManager.config["BSWin10"];
                         botManager.config["BSWin10"] = body[0];
                         botManager.saveConfig()
 
                         var embed = new Discord.RichEmbed()
                             .setTitle('A new version of the BedrockServer Win10 is available for: ' + win10Version + " :pushpin:")
                             .setColor('#0941a9')
-                            .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                         botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Win10 is available for: ' + win10Version + " !\n\n#RT" }, function (error, tweet, response) {
                             botManager.sendToChannels('news', embed)
                             botManager.Bot.users.forEach(function (element) {
@@ -38,16 +38,16 @@ class CheckBedrockServerTask {
                             });
                         });
                     }
-                    if (body[1] !== botManager.config['BSLinux']) {
+                    if (body[1] !== botManager.config['BSLinux'] && body[1] !== botManager.config['BSLinux2']) {
                         var linuxVersion = body[1].split("bedrock-server-")[1].split(".zip")[0];
 
+                        botManager.config["BSLinux2"] = botManager.config["BSLinux2"];
                         botManager.config["BSLinux"] = body[1];
                         botManager.saveConfig()
 
                         var embed = new Discord.RichEmbed()
                             .setTitle('A new version of the BedrockServer Linux is available for: ' + linuxVersion + " :pushpin:")
                             .setColor('#0941a9')
-                            .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                         botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Linux is available for: ' + linuxVersion + " !\n\n#RT" }, function (error, tweet, response) {
                             botManager.sendToChannels('news', embed)
                             botManager.Bot.users.forEach(function (element) {

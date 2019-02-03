@@ -23,8 +23,8 @@ class CheckTeamMojangChannelTask {
                     const embed = new Discord.RichEmbed()
                         .setTitle("A new video is out on the TeamMojang channel ! :pushpin:")
                         .setColor('#0941a9')
-                        .setAuthor("BedrockUpdateBot", botManager.avatarURL)
-                        .setDescription("**Title**: " + body["title"] + "\n**Description**: " + body["description"] + "\n**Published at**: " + body["publishedAt"]);
+                        .setDescription("**Title**: " + body["title"] + "\n**Description**: " + body["description"])
+                        .setTimestamp(new Date(body["publishedAt"]))
                     embed.setURL("https://www.youtube.com/watch?v=" + body["id"]["videoId"])
                     
                     botManager.config["latestVideo2"] = botManager.config["latestVideo"];

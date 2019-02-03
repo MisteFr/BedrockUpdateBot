@@ -12,6 +12,8 @@ class MinecraftDisassembly {
     static run(version) {
         if (fs.existsSync(botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + version + "_beta" : "MCPE/Release/" + version)) {
             if (fs.existsSync(botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + version + "_beta" + "/" + version + "_beta.apk" : "MCPE/Release/" + version + "/" + version + ".apk")) {
+                var yaml_config = require('node-yaml');
+                var config = yaml_config.readSync("./../../dissasembly.yml");
                 botManager.createNewConsoleMessage();
                 botManager.isDoingDisassembly = true;
                 var date = Date.now();
@@ -29,12 +31,12 @@ class MinecraftDisassembly {
                     console.log('Entries read in the zip: ' + zip.entriesCount);
                     for (const entry of Object.values(zip.entries())) {
                         if (entry.name == "assets/profanity_filter.wlist") {
-                            if (entry.size !== botManager.config["profanityFilterSize"]) {
+                            if (entry.size !== config["profanityFilterSize"]) {
                                 zip.extract('assets/profanity_filter.wlist', botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_profanity_filter.wlist" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_profanity_filter.wlist", err => {
                                     console.log(err ? 'Extract error' : 'Extracting profanity_filter.wlist');
-                                    console.log("Profanity filter was updated ! (" + botManager.config["profanityFilterSize"] + " to " + entry.size + " bytes)");
-                                    botManager.updateConsole("Profanity filter was updated ! (" + botManager.config["profanityFilterSize"] + " to " + entry.size + " bytes)");
-                                    botManager.config["profanityFilterSize"] = entry.size;
+                                    console.log("Profanity filter was updated ! (" + config["profanityFilterSize"] + " to " + entry.size + " bytes)");
+                                    botManager.updateConsole("Profanity filter was updated ! (" + config["profanityFilterSize"] + " to " + entry.size + " bytes)");
+                                    config["profanityFilterSize"] = entry.size;
                                 })
                             }
                         }
@@ -44,7 +46,7 @@ class MinecraftDisassembly {
                                 zip.close();
                                 console.log('Getting the packets list');
                                 const { exec } = require('child_process');
-                                exec(botManager.config["lastVersionReleasedIsBeta"] ? "python protocol.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python protocol.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 500 }, (err, stdout, stderr) => {
+                                exec(botManager.config["lastVersionReleasedIsBeta"] ? "python protocol.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python protocol.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 5000 }, (err, stdout, stderr) => {
                                     var protocol = stdout.replace(/\s/g, '');
 
                                     exec(botManager.config["lastVersionReleasedIsBeta"] ? "python packets.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python packets.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 5000 }, (err, stdout, stderr) => {
@@ -73,9 +75,9 @@ class MinecraftDisassembly {
                                         })
 
                                         if (botManager.config["lastVersionReleasedIsBeta"]) {
-                                            var OldPacketsArray = botManager.config["packetListBeta"];
+                                            var OldPacketsArray = config["packetListBeta"];
                                         } else {
-                                            var OldPacketsArray = botManager.config["packetListRelease"];
+                                            var OldPacketsArray = config["packetListRelease"];
                                         }
 
                                         OldPacketsArray.forEach(function (element) {
@@ -173,9 +175,9 @@ class MinecraftDisassembly {
                                         console.log('Saving the packet list to the config');
 
                                         if (botManager.config["lastVersionReleasedIsBeta"]) {
-                                            botManager.config["packetListBeta"] = PacketArray;
+                                            config["packetListBeta"] = PacketArray;
                                         } else {
-                                            botManager.config["packetListRelease"] = PacketArray;
+                                            config["packetListRelease"] = PacketArray;
                                         }
 
                                         var additionalInfosOfPackets = secondPart.split('~~~');
@@ -194,9 +196,9 @@ class MinecraftDisassembly {
 
 
                                         if (botManager.config["lastVersionReleasedIsBeta"]) {
-                                            var oldSecondPart = botManager.config["packetInfoBeta"];
+                                            var oldSecondPart = config["packetInfoBeta"];
                                         } else {
-                                            var oldSecondPart = botManager.config["packetInfoRelease"];
+                                            var oldSecondPart = config["packetInfoRelease"];
                                         }
 
                                         var oldAdditionalInfosOfPackets = oldSecondPart.split('~~~');
@@ -243,17 +245,17 @@ class MinecraftDisassembly {
                                         })
 
                                         console.log('Saving the write&read methods for each packets to config');
-                                        
+
                                         if (botManager.config["lastVersionReleasedIsBeta"]) {
-                                            botManager.config["packetInfoBeta"] = secondPart;
+                                            config["packetInfoBeta"] = secondPart;
                                         } else {
-                                            botManager.config["packetInfoRelease"] = secondPart;
+                                            config["packetInfoRelease"] = secondPart;
                                         }
-                                        
+
 
                                         console.log('Authentificating to github');
 
-                                        var githubClient = github.client(botManager.loginConfig['githubToken']);
+                                        var githubClient = github.client(botManager.config['githubToken']);
 
                                         var toFilter = secondPart.split('\n');
 
@@ -280,11 +282,13 @@ class MinecraftDisassembly {
 
                                         console.log("Extracting symbols of this version")
 
-                                        exec(botManager.config["lastVersionReleasedIsBeta"] ? "readelf -Ws MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "readelf -Ws MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 2048 * 10000 }, (err, stdout, stderr) => {
+                                        exec(botManager.config["lastVersionReleasedIsBeta"] ? "readelf -Ws MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "readelf -Ws MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 2048 * 13000 }, (err, stdout, stderr) => {
                                             if (err) {
                                                 console.log(err.message)
                                                 return;
                                             }
+
+                                            var symbolData = stdout;
 
                                             var newSymbolArrayNameToAddress = [];
                                             var newSymbolList = (stdout.split("Ndx Name")[1]).split("\n");
@@ -299,9 +303,9 @@ class MinecraftDisassembly {
 
                                             var oldSymbolArrayNameToAddress = [];
                                             if (botManager.config["lastVersionReleasedIsBeta"] === true) {
-                                                var oldSymbolList = (botManager.config["symbolsListBeta"].split("Ndx Name")[1]).split("\n");
+                                                var oldSymbolList = (config["symbolsListBeta"].split("Ndx Name")[1]).split("\n");
                                             } else {
-                                                var oldSymbolList = (botManager.config["symbolsListRelease"].split("Ndx Name")[1]).split("\n");
+                                                var oldSymbolList = (config["symbolsListRelease"].split("Ndx Name")[1]).split("\n");
                                             }
 
                                             oldSymbolList.forEach(function (element) {
@@ -369,19 +373,10 @@ class MinecraftDisassembly {
                                             }
 
                                             if (botManager.config["lastVersionReleasedIsBeta"] === true) {
-                                                botManager.config["symbolsListBeta"] = stdout;
+                                                config["symbolsListBeta"] = stdout;
                                             } else {
-                                                botManager.config["symbolsListRelease"] = stdout;
+                                                config["symbolsListRelease"] = stdout;
                                             }
-
-                                            console.log("Uploading symbol list")
-
-                                            githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_symbols.md" : "release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_symbols.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding symbols list from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding symbols bump from " + botManager.config["lastVersionAndroid"] + "."), stdout, (err, data) => {
-                                                if (err) {
-                                                    botManager.updateConsole('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
-                                                    return console.error(err);
-                                                }
-                                            });
 
 
                                             console.log("Uploading version infos")
@@ -393,6 +388,14 @@ class MinecraftDisassembly {
                                                 console.log(data.content.html_url);
                                                 botManager.sendToChannels('pmmp', 'Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' (protocol: ' + protocol + ') here: ' + data.content.html_url)
                                                 botManager.channelToDebugMcpe.send('Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' (protocol: ' + protocol + ') here: ' + data.content.html_url)
+                                                console.log("Uploading symbol list")
+
+                                                githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_symbols.md" : "release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_symbols.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding symbols list from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding symbols bump from " + botManager.config["lastVersionAndroid"] + "."), stdout, (err, data) => {
+                                                    if (err) {
+                                                        botManager.updateConsole('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
+                                                        return console.error(err);
+                                                    }
+                                                });
                                             });
 
                                             console.log(botManager.config["lastVersionReleasedIsBeta"] ? "Found " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "Found " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
@@ -400,9 +403,12 @@ class MinecraftDisassembly {
 
                                             botManager.updateConsole(botManager.config["lastVersionReleasedIsBeta"] ? "\nFound " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "\nFound " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
                                             botManager.updateConsole("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs" + ".")
-    
+
 
                                             botManager.saveConfig()
+
+                                            yaml_config.writeSync("./../../dissasembly.yml", config)
+
                                             botManager.isDoingDisassembly = false;
                                         })
                                     });

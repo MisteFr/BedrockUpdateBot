@@ -33,7 +33,6 @@ class CheckFeaturedServerList {
                                 .setTitle('A new featured server is available on MCBE: ' + body.results[key].title.neutral + " :pushpin:")
                                 .setDescription("IP: " + body.results[key].displayProperties.url + "\nPort: " + body.results[key].displayProperties.port + "\nCreator name: " + body.results[key].displayProperties.creatorName)
                                 .setColor('#0941a9')
-                                .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             botManager.client.post('statuses/update', { status: '📌 A new featured server is available on MCBE: ' + body.results[key].title.neutral + "!\n\n#RT" }, function (error, tweet, response) {
                                 botManager.sendToChannels('news', embed)
                             });

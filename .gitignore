@@ -4,3 +4,5 @@ packets.py
 entityIds.py
 config.yml
 login.yml
+dissasembly.yml
+src/tasks/CheckMarketplaceTask.js

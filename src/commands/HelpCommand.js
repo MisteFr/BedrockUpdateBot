@@ -29,6 +29,10 @@ class HelpCommand {
                         value: "Get the invite link of the bot"
                     },
                     {
+                        name: ">mcpe <ip:port",
+                        value: "Query a MCPE server to get infos about it"
+                    },
+                    {
                         name: ">latestMc",
                         value: "Get the latest MC informations"
                     },
@@ -39,14 +43,6 @@ class HelpCommand {
                     {
                         name: ">listemojis",
                         value: "Get all the emojis of the server you are in"
-                    },
-                    {
-                        name: ">mcpc <ip:port>",
-                        value: "Query a MCPC server to get infos about him"
-                    },
-                    {
-                        name: ">mcpe <ip:port>",
-                        value: "Query a MCPE server to get infos about him"
                     },
                     {
                         name: ">play <youtube link>",

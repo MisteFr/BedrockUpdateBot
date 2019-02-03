@@ -1,14 +1,15 @@
 const Discord = require('discord.js');
 var request = require('request');
+var mcpeping = require('mcpe-ping');
 require('./../BedrockUpdateBot.js');
 
-class MCPECommand {
+class LatestMcpeCommand {
     static getName() {
         return 'mcpe';
     }
 
     static getDescription() {
-        return 'Query a MCPE server to get infos about him';
+        return 'Ping a server';
     }
 
     static getPermission() {
@@ -17,32 +18,20 @@ class MCPECommand {
 
     static executeCommand(message) {
         let args = message.content.split(' ')
-        var url = 'https://use.gameapis.net/mcpe/query/info/' + args[1]
-        request(url, function (err, response, body) {
+        mcpeping(args[1], args[2], function(err, res) {
             if (err) {
-                console.log(err);
-                return message.channel.send("Error.");
-            }
-            if (body.length !== 0) {
-                body = JSON.parse(body);
-                if (body.status) {
-                    const embed = new Discord.RichEmbed()
-                        .setTitle(`Status of ${body.hostname}:${body.port}`)
-                        .setColor('#0941a9')
-                        .setAuthor(botManager.username, botManager.avatarURL)
-                        .setFooter(`Status asked by ${message.author.username}`, message.author.avatarURL)
-                        .addField('Players', body.players.online + '/' + body.players.max)
-                        .addField('MOTD', body.motds.clean)
-                        .addField('Version', "MCPE version " + body.version)
-                    message.channel.send({ embed })
-                } else {
-                    message.channel.send('The server is not answering.')
-                }
-            }else {
                 message.channel.send('The server is not answering.')
+            } else {
+                const embed = new Discord.RichEmbed()
+                .setTitle(`Status of ${args[1]}:${res.rinfo.port}`)
+                .setColor('#0941a9')
+                .setFooter(`Status asked by ${message.author.username}`, message.author.avatarURL)
+                .addField('Players', res.currentPlayers + '/' + res.maxPlayers)
+                .addField('MOTD', res.cleanName)
+            message.channel.send({ embed })
             }
-        });
+        }, 3000);
     }
 }
 
-module.exports = MCPECommand;
+module.exports = LatestMcpeCommand;

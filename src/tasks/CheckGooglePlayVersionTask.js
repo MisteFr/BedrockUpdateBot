@@ -1,7 +1,7 @@
 require('./../BedrockUpdateBot.js')
 const Discord = require('discord.js');
 const fs = require('fs');
-
+var client = require('scp2')
 class CheckGooglePlayVersionTask {
     static getDelay() {
         return 300000; //5 mins
@@ -16,17 +16,17 @@ class CheckGooglePlayVersionTask {
             Initializing them in the botManager corrupt the object for some reasons
         */
         var betaAccount = require('gpapi').GooglePlayAPI({
-            username: botManager.loginConfig["betaAccount"]["username"],
-            password: botManager.loginConfig["betaAccount"]["password"],
-            androidId: botManager.loginConfig["betaAccount"]["androidId"],
+            username: botManager.config["betaAccount"]["username"],
+            password: botManager.config["betaAccount"]["password"],
+            androidId: botManager.config["betaAccount"]["androidId"],
             useCache: false,
             debug: false
         });
 
         var normalAccount = require('gpapi').GooglePlayAPI({
-            username: botManager.loginConfig["normalAccount"]["username"],
-            password: botManager.loginConfig["normalAccount"]["password"],
-            androidId: botManager.loginConfig["normalAccount"]["androidId"],
+            username: botManager.config["normalAccount"]["username"],
+            password: botManager.config["normalAccount"]["password"],
+            androidId: botManager.config["normalAccount"]["androidId"],
             useCache: false,
             debug: false
         });
@@ -47,7 +47,6 @@ class CheckGooglePlayVersionTask {
                         .setTitle(`A new version is out on the Google Play Store for beta users: ` + betaVersion + " :pushpin:")
                         .setDescription(res[0].details.appDetails.recentChangesHtml.replace(/<br\s*\/?>/gi, ' '))
                         .setColor('#0941a9')
-                        .setAuthor("BedrockUpdateBot", botManager.avatarURL)
 
                     botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store for beta users: ' + betaVersion + " !\n\n#RT" }, function (error, tweet, response) {
                         botManager.sendToChannels('news', embed)
@@ -63,6 +62,14 @@ class CheckGooglePlayVersionTask {
                     fStream.on('open', function () {
                         betaAccount.download("com.mojang.minecraftpe", betaVersionCode).then(function (res) {
                             res.pipe(fStream);
+                            client.scp(betaVersion + "_beta.apk", {
+                                host: botManager.config["localHOST"],
+                                username: botManager.config["localUSER"],
+                                password: botManager.config["localPASS"],
+                                path: '/media/HDD/MCPE/Release'
+                            }, function(err) {
+                                console.log(err)
+                            })
                         });
                     })
 
@@ -96,7 +103,6 @@ class CheckGooglePlayVersionTask {
                         .setTitle(`A new version is out on the Google Play Store: ` + botManager.config["lastVersionAndroid"] + " :pushpin:")
                         .setDescription(res[0].details.appDetails.recentChangesHtml.replace(/<br\s*\/?>/gi, ' '))
                         .setColor('#0941a9')
-                        .setAuthor("BedrockUpdateBot", botManager.avatarURL)
 
                     botManager.client.post('statuses/update', { status: '📌 A new version is out on the Google Play Store: ' + normalVersion + " !\n\n#RT" }, function (error, tweet, response) {
                         botManager.sendToChannels('news', embed)
@@ -111,6 +117,14 @@ class CheckGooglePlayVersionTask {
                     fStream.on('open', function () {
                         betaAccount.download("com.mojang.minecraftpe", normalVersionCode).then(function (res) {
                             res.pipe(fStream);
+                            client.scp(normalVersion + ".apk", {
+                                host: botManager.config["localHOST"],
+                                username: botManager.config["localUSER"],
+                                password: botManager.config["localPASS"],
+                                path: '/media/HDD/MCPE/Beta'
+                            }, function(err) {
+                                console.log(err)
+                            })
                         });
                     })
 

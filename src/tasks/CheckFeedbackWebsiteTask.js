@@ -43,7 +43,6 @@ class CheckFeedbackWebsiteTask {
                         var embed = new Discord.RichEmbed()
                             .setTitle(`[RELEASE] A new article is out: ` + body["Release"][0] + " :pushpin:")
                             .setColor('#0941a9')
-                            .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2.substr(0, 2048))
                             .setURL("https://feedback.minecraft.net" + body["Release"][2])
                         botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Release"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Release"][2] + "\n\n#RT" }, function (error, tweet, response) {
@@ -54,7 +53,6 @@ class CheckFeedbackWebsiteTask {
                         var embed = new Discord.RichEmbed()
                             .setTitle(`A new article is out: ` + body["Release"][0] + " :pushpin:")
                             .setColor('#0941a9')
-                            .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2)
                             .setURL("https://feedback.minecraft.net" + body["Release"][2])
                         botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Release"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Release"][2] + "\n\n#RT" }, function (error, tweet, response) {
@@ -91,7 +89,6 @@ class CheckFeedbackWebsiteTask {
                         var embed = new Discord.RichEmbed()
                             .setTitle(`[BETA] A new article is out: ` + body["Beta"][0] + " :pushpin:")
                             .setColor('#0941a9')
-                            .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2.substr(0, 2048))
                             .setURL("https://feedback.minecraft.net" + body["Beta"][2])
                         botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Beta"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Beta"][2] + "\n\n#RT" }, function (error, tweet, response) {
@@ -102,7 +99,6 @@ class CheckFeedbackWebsiteTask {
                         var embed = new Discord.RichEmbed()
                             .setTitle(`A new article is out: ` + body["Beta"][0] + " :pushpin:")
                             .setColor('#0941a9')
-                            .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setDescription(text2)
                             .setURL("https://feedback.minecraft.net" + body["Beta"][2])
                             botManager.client.post('statuses/update', { status: '📌 A new article is out: ' + body["Beta"][0] + ' !\n📲 https://feedback.minecraft.net' + body["Beta"][2] + "\n\n#RT" }, function (error, tweet, response) {

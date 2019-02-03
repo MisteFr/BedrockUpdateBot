@@ -34,7 +34,6 @@ class CheckMinecraftWebsiteTask {
                             .setTitle(botManager.config["lastWebsiteArticle"] + " :pushpin:")
                             .setDescription('**' + element["default_tile"]["sub_header"] + '**')
                             .setColor('#0941a9')
-                            .setAuthor("BedrockUpdateBot", botManager.avatarURL)
                             .setURL("https://minecraft.net" + element["url"])
                             .setImage(element["default_tile"]["image"]["original"]["url"])
                             .setTimestamp(new Date((element["published_at"]) * 1000))

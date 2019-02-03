@@ -16,6 +16,9 @@ class BedrockServerDisassembly {
         }
         fs.mkdirSync("MCPE/Release/" + version + "/BedrockServer")
 
+        var yaml_config = require('node-yaml');
+        var config = yaml_config.readSync("./../../dissasembly.yml");
+
         var file = fs.createWriteStream("MCPE/Release/" + version + "/BedrockServer/" + version + ".zip");
         var request = https.get(url, function (response) {
             response.pipe(file);
@@ -59,7 +62,7 @@ class BedrockServerDisassembly {
 
 
                                     var oldSymbolArrayNameToAddress = [];
-                                    var oldSymbolList = (botManager.config["BSsymbolsListRelease"].split("Ndx Name")[1]).split("\n");
+                                    var oldSymbolList = (config["BSsymbolsListRelease"].split("Ndx Name")[1]).split("\n");
 
                                     oldSymbolList.forEach(function (element) {
                                         var subArray = botManager.cleanArray((element.split(" ")));
@@ -129,7 +132,7 @@ class BedrockServerDisassembly {
 
                                     console.log("Uplaoding symbol list (BedrockServer)")
 
-                                    var githubClient = github.client(botManager.loginConfig['githubToken']);
+                                    var githubClient = github.client(botManager.config['githubToken']);
 
                                     githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents("release/" + version + "/BedrockServer/" + version + "_symbols.md", "Adding symbols bump from " + version + " Bedrock Server.", stdout, (err, data) => {
                                         if (err) {
@@ -149,9 +152,12 @@ class BedrockServerDisassembly {
                                     });
 
 
-                                    botManager.config["BSsymbolsListRelease"] = stdout;
+                                    config["BSsymbolsListRelease"] = stdout;
 
                                     botManager.saveConfig()
+
+                                    yaml_config.writeSync("./../../dissasembly.yml", config)
+                                    
                                     botManager.isDoingDisassembly = false;
                                 })
                             })
