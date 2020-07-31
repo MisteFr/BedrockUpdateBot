@@ -13,7 +13,7 @@ class CheckFeedbackWebsiteTask {
     }
 
     static check(Bot) {
-        var url = "http://145.239.47.15/PMMPBot.php"
+        var url = "http://194.9.172.113/PMMPBot.php"
         request({
             url: url,
             json: true
@@ -59,7 +59,6 @@ class CheckFeedbackWebsiteTask {
                             botManager.sendToChannels('news', embed)
                         });
                     }
-                    console.log(body["Release"][0]);
                     botManager.config["latestFeedbackArticleRelease2"] = botManager.config["latestFeedbackArticleRelease"];
                     botManager.config["latestFeedbackArticleRelease"] = body["Release"][0];
                     botManager.saveConfig()
@@ -105,7 +104,6 @@ class CheckFeedbackWebsiteTask {
                                 botManager.sendToChannels('news', embed)
                             });
                     }
-                    console.log(body["Beta"][0]);
                     botManager.config["latestFeedbackArticleBeta2"] = botManager.config["latestFeedbackArticleBeta"];
                     botManager.config["latestFeedbackArticleBeta"] = body["Beta"][0];
                     botManager.saveConfig()

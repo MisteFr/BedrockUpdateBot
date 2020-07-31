@@ -40,8 +40,8 @@ class MinecraftDisassembly {
                                 })
                             }
                         }
-                        if (entry.name == "lib/armeabi-v7a/libminecraftpe.so") {
-                            zip.extract('lib/armeabi-v7a/libminecraftpe.so', botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", err => {
+                        if (entry.name == "lib/x86/libminecraftpe.so") {
+                            zip.extract('lib/x86/libminecraftpe.so', botManager.config["lastVersionReleasedIsBeta"] ? "MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", err => {
                                 botManager.updateConsole(err ? 'Extract error' : 'Extracting libminecraftpe.so');
                                 zip.close();
                                 console.log('Getting the packets list');
@@ -134,6 +134,7 @@ class MinecraftDisassembly {
                                         var fixedText = "";
                                         var infoText = "Network Protocol = " + protocol + "\n\n * [Protocol diff with " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] : botManager.config["lastVersionAndroid2"]) + "](#protocol-diff)\n\n";
                                         infoText = infoText + "* [Symbols diff with " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] : botManager.config["lastVersionAndroid2"]) + "](#symbols-diff)\n\n";
+                                        infoText = infoText + "* [WSS events diff with " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] : botManager.config["lastVersionAndroid2"]) + "](#wssEvents-diff)\n\n";
                                         infoText = infoText + "### Protocol diff\n\n**Please note that all that is following was extracted using objdump and might no be true ! (If the protocol version isnt bumped it's probably that there are no protocol changes)**\n\n";
 
                                         if (someAdded == true) {
@@ -272,12 +273,14 @@ class MinecraftDisassembly {
 
                                         console.log('Posting on github the protocol documentation..');
 
+/*
                                         githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_protocol.md" : "release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_protocol.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding protocol bump from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding protocol documentation from " + botManager.config["lastVersionAndroid"] + "."), fixedText, (err, data) => {
                                             if (err) {
                                                 botManager.updateConsole('\nError while trying to update the protocol documentation of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
                                                 return console.error(err);
                                             }
                                         });
+                                        */
 
 
                                         console.log("Extracting symbols of this version")
@@ -378,38 +381,129 @@ class MinecraftDisassembly {
                                                 config["symbolsListRelease"] = stdout;
                                             }
 
+                                            console.log('Extracting WSS Events');
 
-                                            console.log("Uploading version infos")
-                                            githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_info.md" : "release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_info.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding protocol and symbol list diffs infos from " + botManager.config["lastVersionAndroidBeta"] + " (protocol: " + protocol + ")." : "Adding protocol and symbol list diffs from " + botManager.config["lastVersionAndroid"] + " (protocol: " + protocol + ")."), infoText, (err, data) => {
+                                            exec(botManager.config["lastVersionReleasedIsBeta"] ? "python wssEvents.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python wssEvents.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 5000 }, (err, stdout, stderr) => {
                                                 if (err) {
-                                                    botManager.updateConsole('\nError while trying to update the version infos  of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
-                                                    return console.error("error" + err);
+                                                    console.log(err.message)
+                                                    return;
                                                 }
-                                                console.log(data.content.html_url);
-                                                botManager.sendToChannels('pmmp', 'Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' (protocol: ' + protocol + ') here: ' + data.content.html_url)
-                                                botManager.channelToDebugMcpe.send('Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' (protocol: ' + protocol + ') here: ' + data.content.html_url)
-                                                console.log("Uploading symbol list")
+    
+                                                var eventsData = stdout;
+    
+                                                var newEventsList = eventsData.split("\n");
 
-                                                githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_symbols.md" : "release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_symbols.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding symbols list from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding symbols bump from " + botManager.config["lastVersionAndroid"] + "."), stdout, (err, data) => {
-                                                    if (err) {
-                                                        botManager.updateConsole('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
-                                                        return console.error(err);
+                                                if (botManager.config["lastVersionReleasedIsBeta"] === true) {
+                                                    var oldEventsList = config["eventsListBeta"].split("\n");
+                                                } else {
+                                                    var oldEventsList = config["eventsListRelease"].split("\n");
+                                                }
+    
+    
+                                                var Added = [];
+                                                var someAdded = false;
+    
+                                                for (var element in newEventsList) {
+                                                    if (!oldEventsList.hasOwnProperty(element)) {
+                                                        Added[element] = newEventsList[element];
+                                                        someAdded = true;
                                                     }
+                                                }
+    
+                                                var Removed = [];
+                                                var someRemoved = false;
+    
+                                                for (var element in oldEventsList) {
+                                                    if (!newEventsList.hasOwnProperty(element)) {
+                                                        Removed[element] = oldEventsList[element];
+                                                        someRemoved = true;
+                                                    }
+                                                }
+    
+                                                infoText = infoText + "\n\n\n\n### wssEvents diff\n\n";
+    
+                                                var textToPublish = "";
+    
+                                                if (someRemoved !== false || someAdded !== false) {
+                                                    if (someAdded === true) {
+                                                        infoText = infoText + "There are some new wssEvents added in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                        console.log('Found new wssEvents !');
+                                                        infoText = infoText + "\n" + "```";
+                                                        for (var key in Added) {
+                                                            var value = Added[key];
+                                                            infoText = infoText + "\n" + "    - " + key + " (Name: " + value + ")"
+                                                        }
+                                                        infoText = infoText + "\n" + "```";
+                                                    } else {
+                                                        infoText = infoText + "There are no wssEvents added in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                    }
+    
+                                                    infoText = infoText + "\n\n";
+    
+                                                    if (someRemoved === true) {
+                                                        infoText = infoText + "There are some new wssEvents removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                        console.log('Found removed wssEvents !');
+                                                        infoText = infoText + "\n" + "```";
+                                                        for (var key in Removed) {
+                                                            var value = Removed[key];
+                                                            infoText = infoText + "\n" + "    - " + key + " (Name: " + value + ")"
+                                                        }
+                                                        infoText = infoText + "\n" + "```";
+                                                    } else {
+                                                        infoText = infoText + "There are no wssEvents removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                    }
+                                                } else {
+                                                    infoText = infoText + "There are no wssEvents added and removed in this version by comparaison to " + (botManager.config["lastVersionReleasedIsBeta"] ? botManager.config["lastVersionAndroidBeta2"] + "." : botManager.config["lastVersionAndroid2"] + ".");
+                                                }
+    
+                                                if (botManager.config["lastVersionReleasedIsBeta"] === true) {
+                                                    config["eventsListBeta"] = stdout;
+                                                } else {
+                                                    config["eventsListRelease"] = stdout;
+                                                }
+
+
+                                                console.log("Uploading version infos")
+
+                                                /*
+                                                githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_info.md" : "release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_info.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding protocol and symbol list diffs infos from " + botManager.config["lastVersionAndroidBeta"] + " (protocol: " + protocol + ")." : "Adding protocol and symbol list diffs from " + botManager.config["lastVersionAndroid"] + " (protocol: " + protocol + ")."), infoText, (err, data) => {
+                                                    if (err) {
+                                                        botManager.updateConsole('\nError while trying to update the version infos  of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
+                                                        return console.error("error" + err);
+                                                    }
+                                                    console.log(data.content.html_url);
+                                                    botManager.sendToChannels('pmmp', 'Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' (protocol: ' + protocol + ') here: ' + data.content.html_url)
+                                                    botManager.channelToDebugMcpe.send('Uploaded the version infos of ' + botManager.config['lastVersionReleased'] + ' (protocol: ' + protocol + ') here: ' + data.content.html_url)
+                                                    console.log("Uploading symbol list")
+
+                                                    githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_symbols.md" : "release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_symbols.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding symbols list from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding symbols bump from " + botManager.config["lastVersionAndroid"] + "."), symbolData, (err, data) => {
+                                                        if (err) {
+                                                            botManager.updateConsole('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
+                                                            return console.error(err);
+                                                        }
+                                                        githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents((botManager.config["lastVersionReleasedIsBeta"] ? "beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + "_wssEvents.md" : "release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + "_wssEvents.md"), (botManager.config["lastVersionReleasedIsBeta"] ? "Adding wssEvents list from " + botManager.config["lastVersionAndroidBeta"] + "." : "Adding wssEvents list from " + botManager.config["lastVersionAndroid"] + "."), eventsData.replace("\n", "\n  "), (err, data) => {
+                                                            if (err) {
+                                                                botManager.updateConsole('\nError while trying to update the wssEvents list of this version (' + botManager.config['lastVersionReleased'] + '). Error message: ' + err.message);
+                                                                return console.error(err);
+                                                            }
+                                                        });
+                                                    });
                                                 });
-                                            });
+                                                */
 
-                                            console.log(botManager.config["lastVersionReleasedIsBeta"] ? "Found " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "Found " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
-                                            console.log("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs")
+                                                console.log(botManager.config["lastVersionReleasedIsBeta"] ? "Found " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "Found " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
+                                                console.log("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs")
 
-                                            botManager.updateConsole(botManager.config["lastVersionReleasedIsBeta"] ? "\nFound " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "\nFound " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
-                                            botManager.updateConsole("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs" + ".")
+                                                botManager.updateConsole(botManager.config["lastVersionReleasedIsBeta"] ? "\nFound " + packetCount + " packets in this version (" + botManager.config["lastVersionAndroidBeta"] + ") !" : "\nFound " + i + " packets in this version (" + botManager.config["lastVersionAndroid"] + ") !")
+                                                botManager.updateConsole("Time took by the operation: " + ((Date.now() - date) / 1000) + " secs" + ".")
 
 
-                                            botManager.saveConfig()
+                                                botManager.saveConfig()
 
-                                            yaml_config.writeSync("./../../dissasembly.yml", config)
+                                                yaml_config.writeSync("./../../dissasembly.yml", config)
 
-                                            botManager.isDoingDisassembly = false;
+                                                botManager.isDoingDisassembly = false;
+                                            })
                                         })
                                     });
                                 });

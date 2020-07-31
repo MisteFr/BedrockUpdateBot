@@ -13,15 +13,14 @@ class CheckMinecraftWebsiteTask {
     }
 
     static check(Bot) {
-        var url = "https://minecraft.net/en-us/api/tiles/channel/not_set,Community%20content/region/None/category/Culture,Insider,Merch,News"
+        var url = "https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/news,minecraft:article/insider,minecraft:article/culture,minecraft:article/merch,minecraft:stockholm/news,minecraft:stockholm/guides,minecraft:stockholm/events,minecraft:stockholm/minecraft-builds,minecraft:stockholm/marketplace,minecraft:stockholm/deep-dives,minecraft:stockholm/merch,minecraft:stockholm/earth,minecraft:stockholm/dungeons,minecraft:stockholm/realms-plus,minecraft:stockholm/realms-java,minecraft:stockholm/minecraft,minecraft:stockholm/nether&propResPath=/content/minecraft-net/language-masters/en-us/jcr:content/root/generic-container/par/bleeding_page_sectio_1278766118/page-section-par/grid&count=500&pageSize=4&lang=/content/minecraft-net/language-masters/en-us"
         request({
             url: url,
             json: true
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
-                var textContainingTitles = "";
                 var toCheck = botManager.config["textContainingTitles"];
-                body["result"].forEach(function (element) {
+                body["article_grid"].forEach(function (element) {
                     if (!(toCheck.includes(element["default_tile"]["title"]))) {
                         console.log(element["default_tile"]["title"]);
                         botManager.config["textContainingTitles"] += element["default_tile"]["title"] + ", ";
@@ -34,12 +33,12 @@ class CheckMinecraftWebsiteTask {
                             .setTitle(botManager.config["lastWebsiteArticle"] + " :pushpin:")
                             .setDescription('**' + element["default_tile"]["sub_header"] + '**')
                             .setColor('#0941a9')
-                            .setURL("https://minecraft.net" + element["url"])
-                            .setImage(element["default_tile"]["image"]["original"]["url"])
-                            .setTimestamp(new Date((element["published_at"]) * 1000))
+                            .setURL("https://minecraft.net" + element["article_url"])
+                            .setImage("https://www.minecraft.net" + element["default_tile"]["image"]["imageURL"])
+                            .setTimestamp(new Date((element["publish_date"]) * 1000))
 
 
-                        botManager.getImage(element["default_tile"]["image"]["original"]["url"], function (err, data) {
+                        botManager.getImage("https://www.minecraft.net" + element["default_tile"]["image"]["imageURL"], function (err, data) {
                             if (err) {
                                 throw new Error(err);
                             } else {
@@ -47,7 +46,7 @@ class CheckMinecraftWebsiteTask {
 
                                     if (!error) {
                                         var status = {
-                                            status: '📌 A new article is out on the Minecraft website: ' + botManager.config["lastWebsiteArticle"] + " !\n📲 https://minecraft.net" + element["url"] + "\n\n#RT",
+                                            status: '📌 A new article is out on the Minecraft website: ' + botManager.config["lastWebsiteArticle"] + " !\n📲 https://minecraft.net" + element["article_url"] + "",
                                             media_ids: media.media_id_string // Pass the media id string
                                         }
 

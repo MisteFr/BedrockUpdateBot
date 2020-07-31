@@ -12,7 +12,7 @@ class CheckFeaturedServerList {
     }
 
     static check(Bot) {
-        var jsonObject = { "count": true, "filter": "(contentType eq '3PP') and platforms/any(p: p eq 'uwp.store') and contents/any(c: c/minClientVersion le '" + botManager.config["lastVersionAndroid"] + "' and c/maxClientVersion gt '" + botManager.config["lastVersionAndroid"] + "')", "orderBy": "startDate desc", "scid": "4fc10100-5f7a-4470-899b-280835760c07", "top": 25 };
+        var jsonObject = {"count":true,"filter":"(contentType eq '3PP_V2.0') and platforms/any(tp: tp eq 'uwp.store' and tp eq 'title.bedrockvanilla')","orderBy":"startDate desc","scid":"4fc10100-5f7a-4470-899b-280835760c07","select":"images","top":25};
 
         var url = "https://xforge.xboxlive.com/v2/catalog/items/search"
         request({
@@ -23,9 +23,10 @@ class CheckFeaturedServerList {
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 if (body.count > botManager.config["featuredServersCount"]) {
+                    console.log(body)
                     for (var key in body.results) {
                         var name = body.results[key]["title"].neutral;
-                        if (name !== "The Hive" && name !== "Mineplex" && name !== "Lifeboat Network" && name !== "CubeCraft Games" && name !== "InPvP - Fun Space Minigames") {
+                        if (name !== "The Hive" && name !== "Mineplex" && name !== "Lifeboat Network" && name !== "CubeCraft Games" && name !== "Mineville City : Roleplay") {
                             botManager.config["featuredServersCount"] = body.count;
                             botManager.saveConfig()
 

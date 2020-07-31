@@ -5,7 +5,7 @@ var https = require('https');
 
 class CheckTeamMojangChannelTask {
     static getDelay() {
-        return 30000;
+        return 120000;
     }
 
     static getName() {
@@ -13,7 +13,7 @@ class CheckTeamMojangChannelTask {
     }
 
     static check(Bot) {
-        var url = "http://145.239.47.15/LastVideo.php"
+        var url = "http://194.9.172.113/LastVideo.php"
         request({
             url: url,
             json: true
@@ -31,7 +31,7 @@ class CheckTeamMojangChannelTask {
                     botManager.config["latestVideo"] = body["title"];
                     botManager.saveConfig()
 
-                    botManager.client.post('statuses/update', { status: '📌 A new video is out: ' + body["title"] + ' !\n📲 https://www.youtube.com/watch?v=' + body["id"]["videoId"] + "\n\n#RT" }, function (error, tweet, response) {
+                    botManager.client.post('statuses/update', { status: '📌 A new video is out: ' + body["title"] + ' !\n📲 https://www.youtube.com/watch?v=' + body["id"]["videoId"] + "" }, function (error, tweet, response) {
                         botManager.sendToChannels('news', embed)
                     });
                 }

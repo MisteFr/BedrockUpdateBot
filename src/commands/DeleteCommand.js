@@ -14,7 +14,7 @@ class DeleteCommand {
     }
 
     static executeCommand(message) {
-        botManager.Bot.channelsToSend.forEach((data, id) => {
+        botManager.Bot.guildsToSend.forEach((data, id) => {
             var guildId = id;
             for (var key in data) {
                 var channelName = Object.keys(data[key])[0];

@@ -23,46 +23,33 @@ class HelpCommand {
                         icon_url: botManager.avatarURL
                     },
                     title: "Commands",
-                    description: "Here are the commands available",
                     fields: [{
                         name: ">invite",
                         value: "Get the invite link of the bot"
                     },
                     {
-                        name: ">mcpe <ip:port",
-                        value: "Query a MCPE server to get infos about it"
+                        name: ">marketplace register|unregister #channel",
+                        value: "Set up a channel to receive marketplace changes."
+                    },
+                    {
+                        name: ">documentation register|unregister #channel",
+                        value: "Set up a channel to receive documentation updates."
+                    },
+                    {
+                        name: ">mcpe <ip:port>",
+                        value: "Query a MCPE server to get information regarding player count, etc."
                     },
                     {
                         name: ">latestMc",
-                        value: "Get the latest MC informations"
+                        value: "Get the latest Minecraft Java release and snapshot published"
                     },
                     {
                         name: ">latestMcpe",
-                        value: "Get the latest MCPE informations"
+                        value: "Get the latest Minecraft Bedrock release and snapshot published"
                     },
                     {
                         name: ">listemojis",
                         value: "Get all the emojis of the server you are in"
-                    },
-                    {
-                        name: ">play <youtube link>",
-                        value: "Play a youtube link"
-                    },
-                    {
-                        name: ">pause",
-                        value: "Pause the actual song"
-                    },
-                    {
-                        name: ">resume",
-                        value: "Resume the song paused"
-                    },
-                    {
-                        name: ">replay",
-                        value: "Replay the last song played"
-                    },
-                    {
-                        name: ">stop",
-                        value: "Stop the song beeing played"
                     }
                     ],
                     timestamp: new Date(),

@@ -5,7 +5,7 @@ var BedrockUpdateBotManager = require('./manager/BedrockUpdateBotManager');
 
 global.botManager = new BedrockUpdateBotManager()
 
-Bot.login(botManager.config["botToken"]);
+Bot.login(botManager.loginConfig["botToken"]);
 
 Bot.on('ready', () => {
   botManager.init(Bot)
@@ -20,45 +20,76 @@ Bot.on('error', e => {
 });
 
 Bot.on("guildCreate", guild => {
-  guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
-  Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
-  console.log(guild.name)
-  botManager.getDefaultChannel(guild)
-    .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
-  botManager.config["waitingForFinalRegister"].push(guild.id)
-  botManager.saveConfig()
-  Bot.users.forEach(function (element) {
-    if (element.id == botManager.config['ownerId']) {
-      element.send("Added on " + guild.name + " owned by " + guild.owner.user.username + ".");
-    }
-  });
+  if(botManager.loginConfig['channels'][guild.id] == undefined){
+    guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
+    Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
+    console.log(guild.name)
+    botManager.getDefaultChannel(guild)
+      .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+    botManager.loginConfig["waitingForFinalRegister"].push(guild.id)
+    botManager.saveConfig()
+    Bot.users.forEach(function (element) {
+      if (element.id == botManager.config['ownerId']) {
+        element.send("Added on " + guild.name + " owned by " + guild.owner.user.username + ".");
+      }
+    });
+  }else{
+    Bot.users.forEach(function (element) {
+      if (element.id == botManager.config['ownerId']) {
+        element.send("Back from outage: " + guild.name + ".");
+      }
+    });
+  }
 })
 
 
 Bot.on("guildDelete", guild => {
-  if (botManager.config['channels'][guild.id] !== null && botManager.config['channels'][guild.id] !== undefined) {
-    delete botManager.config['channels'][guild.id]
-    botManager.saveConfig()
-    if (botManager.Bot.channelsToSend.has(guild.id)) {
-      botManager.Bot.channelsToSend.delete(guild.id)
+  if(guild.available){
+    if (botManager.loginConfig['channels'][guild.id] !== null && botManager.loginConfig['channels'][guild.id] !== undefined) {
+      delete botManager.loginConfig['channels'][guild.id]
+      botManager.saveConfig()
+      if (botManager.Bot.guildsToSend.has(guild.id)) {
+        botManager.Bot.guildsToSend.delete(guild.id)
+      }
     }
+    if (botManager.loginConfig["waitingForFinalRegister"].includes(guild.id)) {
+      botManager.loginConfig["waitingForFinalRegister"] = botManager.loginConfig["waitingForFinalRegister"].filter(item => item !== guild.id)
+      botManager.saveConfig()
+    }
+    Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
+    Bot.users.forEach(function (element) {
+      if (element.id == botManager.config["ownerId"]) {
+        element.send("Removed from " + guild.name + " owned by " + guild.owner.user.username + ".");
+      }
+    });
+  }else{
+    Bot.users.forEach(function (element) {
+      if (element.id == botManager.config["ownerId"]) {
+        element.send("Outage for " + guild.name + ".");
+      }
+    });
   }
-  Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
-  Bot.users.forEach(function (element) {
-    if (element.id == botManager.config["ownerId"]) {
-      element.send("Removed from " + guild.name + " owned by " + guild.owner.user.username + ".");
-    }
-  });
 })
 
 Bot.on("channelUpdate", (oldChannel, newChannel) => {
   var guildId = oldChannel.guild.id;
-  if (botManager.Bot.channelsToSend.get(guildId) !== undefined) {
-    if (botManager.Bot.channelsToSend.get(guildId)[0][oldChannel.name] !== undefined) {
-      var objectToSave = {}
-      objectToSave[newChannel.name] = ["news"];
-      botManager.config['channels'][newChannel.guild.id] = [objectToSave];
-      botManager.Bot.channelsToSend.set(newChannel.guild.id, botManager.config["channels"][newChannel.guild.id]);
+  if (botManager.Bot.guildsToSend.get(guildId) !== undefined) {
+    if (oldChannel.name !== newChannel.name) {
+      var newObject = [];
+
+      botManager.loginConfig['channels'][guildId].forEach(function (element) {
+        let key = Object.keys(element)[0];
+        if (key == oldChannel.name) {
+          key = newChannel.name;
+        }
+        let val = Object.values(element);
+        let objectToSave = {}
+        objectToSave[key] = val[0];
+        newObject.push(objectToSave)
+      })
+
+      botManager.loginConfig['channels'][newChannel.guild.id] = newObject;
+      botManager.Bot.guildsToSend.set(newChannel.guild.id, botManager.loginConfig["channels"][newChannel.guild.id]);
       botManager.saveConfig()
     }
   }
@@ -66,18 +97,42 @@ Bot.on("channelUpdate", (oldChannel, newChannel) => {
 
 Bot.on("channelDelete", channel => {
   var guildId = channel.guild.id;
-  if (botManager.Bot.channelsToSend.get(guildId) !== undefined) {
-    if (botManager.Bot.channelsToSend.get(guildId)[0][channel.name] !== undefined) {
-      if (botManager.config['channels'][channel.guild.id] !== null && botManager.config['channels'][channel.guild.id] !== undefined) {
-        delete botManager.config['channels'][channel.guild.id]
-        if (botManager.Bot.channelsToSend.has(channel.guild.id)) {
-          botManager.Bot.channelsToSend.delete(channel.guild.id)
+  if (botManager.Bot.guildsToSend.get(guildId) !== undefined) {
+    if (botManager.loginConfig['channels'][channel.guild.id] !== null && botManager.loginConfig['channels'][channel.guild.id] !== undefined) {
+      if (Object.keys(botManager.loginConfig['channels'][channel.guild.id]).length == 1) {
+        if(botManager.loginConfig['channels'][channel.guild.id][0][channel.name]){
+          delete botManager.loginConfig['channels'][channel.guild.id]
+        if (botManager.Bot.guildsToSend.has(channel.guild.id)) {
+          botManager.Bot.guildsToSend.delete(channel.guild.id)
         }
-        botManager.config["waitingForFinalRegister"].push(channel.guild.id)
+        botManager.loginConfig["waitingForFinalRegister"].push(channel.guild.id)
         botManager.saveConfig()
-        channel.guild.owner.user.send("Hey !\nYou just removed the channel I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
+        channel.guild.owner.user.send("Hey !\nYou just removed the channel where I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
         botManager.getDefaultChannel(channel.guild)
-          .then(defaultChannel => defaultChannel.send("Hey <@" + channel.guild.ownerID + "> !\nYou just removed the channel I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+          .then(defaultChannel => defaultChannel.send("Hey <@" + channel.guild.ownerID + "> !\nYou just removed the channel I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+        }
+      } else {
+        var newObject = [];
+        botManager.loginConfig['channels'][guildId].forEach(function (element) {
+          let key = Object.keys(element)[0];
+          if (key != channel.name) {
+            let val = Object.values(element);
+            let objectToSave = {}
+            objectToSave[key] = val[0];
+            newObject.push(objectToSave)
+          }
+          if (Object.keys(element)[0] == channel.name) {
+            if ((Object.values(element)[0]).includes("news")) {
+              botManager.loginConfig["waitingForFinalRegister"].push(channel.guild.id)
+              botManager.saveConfig()
+              channel.guild.owner.user.send("Hey !\nYou just removed the channel where I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
+              botManager.getDefaultChannel(channel.guild)
+                .then(defaultChannel => defaultChannel.send("Hey <@" + channel.guild.ownerID + "> !\nYou just removed the channel I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+            }
+          }
+        })
+        botManager.loginConfig['channels'][guildId] = newObject;
+        botManager.saveConfig()
       }
     }
   }
@@ -85,17 +140,22 @@ Bot.on("channelDelete", channel => {
 
 
 Bot.on('message', message => {
+  if (message.guild) {
+    if (message.guild.id === "427140849546035201" && message.author.id === "427139134721622026" && message.channel.name === "json-notifications") {
+      botManager.checkVersionAndDownload(message);
+    }
+  }
   if (message.guild !== null && message.author.username !== "BedrockUpdateBot") {
-    if (botManager.config["waitingForFinalRegister"].includes(message.guild.id) && message.content.includes('The channel I chose is') && !message.content.includes('Thanks for')) {
+    if (botManager.loginConfig["waitingForFinalRegister"].includes(message.guild.id) && message.content.includes('The channel I choose is') && !message.content.includes('Thanks for')) {
       if (message.mentions.channels.size === 1) {
         var nameOfTheChannel = message.mentions.channels.first().name;
         if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
           var objectToSave = {}
           objectToSave[nameOfTheChannel] = ["news"];
-          botManager.config['channels'][message.guild.id] = [objectToSave];
-          botManager.Bot.channelsToSend.set(message.guild.id, botManager.config["channels"][message.guild.id]);
+          botManager.loginConfig['channels'][message.guild.id] = [objectToSave];
+          botManager.Bot.guildsToSend.set(message.guild.id, botManager.loginConfig["channels"][message.guild.id]);
           message.reply("Correctly setted up the bot for this discord server !\nYou will now receive all the Minecraft & Minecraft Bedrock latest news on the channel " + nameOfTheChannel + ".")
-          botManager.config["waitingForFinalRegister"] = botManager.config["waitingForFinalRegister"].filter(item => item !== message.guild.id)
+          botManager.loginConfig["waitingForFinalRegister"] = botManager.loginConfig["waitingForFinalRegister"].filter(item => item !== message.guild.id)
           botManager.saveConfig()
           return true;
         } else {
@@ -103,22 +163,22 @@ Bot.on('message', message => {
         }
       }
 
-      var nameOfTheChannel = (message.content.replace("The channel I chose is", "")).replace(/\s/g, '');
+      var nameOfTheChannel = (message.content.replace("The channel I choose is", "")).replace(/\s/g, '');
       var channelChose = Bot.guilds.get(message.guild.id).channels.find('name', nameOfTheChannel);
       if (channelChose !== null && channelChose !== undefined) {
         if (message.author.id === message.guild.ownerID) {
           var objectToSave = {}
           objectToSave[nameOfTheChannel] = ["news"];
-          botManager.config['channels'][message.guild.id] = [objectToSave];
-          botManager.Bot.channelsToSend.set(message.guild.id, botManager.config["channels"][message.guild.id]);
+          botManager.loginConfig['channels'][message.guild.id] = [objectToSave];
+          botManager.Bot.guildsToSend.set(message.guild.id, botManager.loginConfig["channels"][message.guild.id]);
           message.reply("Correctly setted up the bot for this discord server !\nYou will now receive all the Minecraft & Minecraft Bedrock latest news on the channel " + nameOfTheChannel + ".")
-          botManager.config["waitingForFinalRegister"] = botManager.config["waitingForFinalRegister"].filter(item => item !== message.guild.id)
+          botManager.loginConfig["waitingForFinalRegister"] = botManager.loginConfig["waitingForFinalRegister"].filter(item => item !== message.guild.id)
           botManager.saveConfig()
         } else {
           message.reply("Only the owner of the discord server can set the channel.")
         }
       } else {
-        message.reply("Can't find the channel (" + nameOfTheChannel + ") on this discord server. Please retry: The channel I chose is <name>")
+        message.reply("Can't find the channel (" + nameOfTheChannel + ") on this discord server. Please retry: The channel I choose is <name>")
       }
     }
   }
@@ -161,7 +221,7 @@ Bot.on('message', message => {
   }
 
   if (command.getPermission() == 'miste' && message.author.id != botManager.config['ownerId']) {
-    return message.reply("You don't have permission to use this command!");
+    return message.reply("You don't have the permission to use this command.");
   }
 
   try {

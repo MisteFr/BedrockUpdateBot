@@ -29,13 +29,13 @@ class BedrockServerDisassembly {
                 });
 
                 zip.on('ready', () => {
-                    console.log('Entries read in the apk: ' + zip.entriesCount);
+                    console.log('Entries read in the zip file: ' + zip.entriesCount);
                     for (const entry of Object.values(zip.entries())) {
                         if (entry.name == "bedrock_server") {
                             zip.extract('bedrock_server', "MCPE/Release/" + version + "/BedrockServer/" + version, err => {
                                 zip.close();
                                 const { exec } = require('child_process');
-                                exec("readelf -Ws MCPE/Release/" + version + "/BedrockServer/" + version, { maxBuffer: 2048 * 20000 }, (err, stdout, stderr) => {
+                                exec("readelf -Ws MCPE/Release/" + version + "/BedrockServer/" + version, { maxBuffer: 2048 * 100000 }, (err, stdout, stderr) => {
                                     if (err) {
                                         console.log(err.message)
                                         return;
@@ -100,7 +100,6 @@ class BedrockServerDisassembly {
                                         if (someAdded === true) {
                                             infoText = infoText + "There are some new symbols added in this version by comparaison to " + comparedVersion + ".";
                                             console.log('Found new symbols (Bedrock Server)!');
-                                            console.log(Added)
                                             infoText = infoText + "\n" + "```";
                                             for (var key in Added) {
                                                 var value = Added[key];
@@ -116,7 +115,6 @@ class BedrockServerDisassembly {
                                         if (someRemoved === true) {
                                             infoText = infoText + "There are some new symbols removed in this version by comparaison to " + comparedVersion + ".";
                                             console.log('Found removed symbols (Bedrock Server)!');
-                                            console.log(Removed)
                                             infoText = infoText + "\n" + "```";
                                             for (var key in Removed) {
                                                 var value = Removed[key];
@@ -130,34 +128,29 @@ class BedrockServerDisassembly {
                                         infoText = infoText + "There are no symbols added and removed in this version by comparaison to " + comparedVersion + ".";
                                     }
 
-                                    console.log("Uplaoding symbol list (BedrockServer)")
+                                    console.log("Uploading symbol list (BedrockServer)")
 
                                     var githubClient = github.client(botManager.config['githubToken']);
-
-                                    githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents("release/" + version + "/BedrockServer/" + version + "_symbols.md", "Adding symbols bump from " + version + " Bedrock Server.", stdout, (err, data) => {
+                                    githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents("release/" + version + "/BedrockServer/" + version + "_info.md", "Adding symbols diffs from " + version + " Bedrock Server", infoText, (err, data) => {
                                         if (err) {
-                                            botManager.updateConsole('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);
-                                            return console.error(err);
+                                            botManager.channelToDebugMcpe.send('\nError while trying to update the version infos  of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);
+                                            return console.error("error" + err);
                                         } else {
-                                            githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents("release/" + version + "/BedrockServer/" + version + "_info.md", "Adding symbols diffs from " + version + " Bedrock Server", infoText, (err, data) => {
+                                            githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents("release/" + version + "/BedrockServer/" + version + "_symbols.md", "Adding symbols bump from " + version + " Bedrock Server.", stdout, (err, data) => {
                                                 if (err) {
-                                                    botManager.updateConsole('\nError while trying to update the version infos  of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);
-                                                    return console.error("error" + err);
+                                                    botManager.channelToDebugMcpe.send('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);
+                                                    return console.error(err);
                                                 }
-                                                console.log(data.content.html_url);
-                                                botManager.sendToChannels('pmmp', 'Uploaded the version infos of ' + botManager.config['lastVersionAndroid'] + ' (BedrockServer) here: ' + data.content.html_url)
-                                                botManager.channelToDebugMcpe.send('Uploaded the version infos of ' + botManager.config['lastVersionAndroid'] + ' (BedrockServer) here: ' + data.content.html_url)
                                             });
                                         }
+                                        console.log(data.content.html_url);
+                                        botManager.sendToChannels('pmmp', 'Uploaded the version infos of ' + version + ' (BedrockServer) here: ' + data.content.html_url)
+                                        botManager.channelToDebugMcpe.send('Uploaded the version infos of ' + version + ' (BedrockServer) here: ' + data.content.html_url)
                                     });
 
-
                                     config["BSsymbolsListRelease"] = stdout;
-
                                     botManager.saveConfig()
-
                                     yaml_config.writeSync("./../../dissasembly.yml", config)
-                                    
                                     botManager.isDoingDisassembly = false;
                                 })
                             })

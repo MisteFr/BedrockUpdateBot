@@ -1,12 +1,16 @@
 const yaml_config = require('node-yaml');
 const config = yaml_config.readSync("./../../config.yml");
+const loginConfig = yaml_config.readSync("./../../bot.yml");
 const fs = require('fs');
 const https = require('https');
 const Repeat = require('repeat');
 const path = require("path");
 const Twitter = require('twitter');
 const Discord = require('discord.js');
-
+var http = require('http');
+var client = require('scp2')
+const StreamZip = require('node-stream-zip');
+var request = require('request');
 class BedrockUpdateBotManager {
 
     constructor() {
@@ -19,7 +23,9 @@ class BedrockUpdateBotManager {
         this.needConfirmationAuthor = undefined;
         this.LastContent = undefined;
         this.config = config;
+        this.loginConfig = loginConfig;
         this.turn = 0;
+        this.countAdded;
     }
 
     init(Bot) {
@@ -29,25 +35,27 @@ class BedrockUpdateBotManager {
         this.username = Bot.user.username;
         this.isDoingDisassembly = false;
         this.isDoingMarketplaceCheck = false;
+        this.isCheckingPatchNotes = false;
 
         Bot.user.setActivity("Mojang | >help | " + this.Bot.guilds.size + " guilds", { type: ("WATCHING") });
 
         console.log('Logging in Twitter..')
         this.client = new Twitter({
-            consumer_key: config["Twitter"]["consumer_key"],
-            consumer_secret: config["Twitter"]["consumer_secret"],
-            access_token_key: config["Twitter"]["access_token_key"],
-            access_token_secret: config["Twitter"]["access_token_secret"]
-        });
-        
-        this.hytaleClient = new Twitter({
-            consumer_key: config["hytaleTwitter"]["consumer_key"],
-            consumer_secret: config["hytaleTwitter"]["consumer_secret"],
-            access_token_key: config["hytaleTwitter"]["access_token_key"],
-            access_token_secret: config["hytaleTwitter"]["access_token_secret"]
+            consumer_key: loginConfig["Twitter"]["consumer_key"],
+            consumer_secret: loginConfig["Twitter"]["consumer_secret"],
+            access_token_key: loginConfig["Twitter"]["access_token_key"],
+            access_token_secret: loginConfig["Twitter"]["access_token_secret"]
         });
 
-        this.channelToDebugMcpe = Bot.guilds.get(this.config['specialId']).channels.find('name', 'updates');
+        this.hytaleClient = new Twitter({
+            consumer_key: loginConfig["hytaleTwitter"]["consumer_key"],
+            consumer_secret: loginConfig["hytaleTwitter"]["consumer_secret"],
+            access_token_key: loginConfig["hytaleTwitter"]["access_token_key"],
+            access_token_secret: loginConfig["hytaleTwitter"]["access_token_secret"]
+        });
+
+        //this.channelToDebugMcpe = Bot.guilds.get(this.config['specialId']).channels.get('428631827297599499');
+        this.channelToDebugMcpe = Bot.guilds.get('419294780921479178').channels.get('614121817765838848');
 
 
         console.log('Registering commands..')
@@ -59,18 +67,18 @@ class BedrockUpdateBotManager {
         }
 
         console.log('Registering channels..')
-        this.Bot.channelsToSend = new Discord.Collection();
-        for (var key in this.config["channels"]) {
-            this.Bot.channelsToSend.set(key, this.config["channels"][key]);
+        this.Bot.guildsToSend = new Discord.Collection();
+        for (var key in this.loginConfig["channels"]) {
+            this.Bot.guildsToSend.set(key, this.loginConfig["channels"][key]);
         }
 
         console.log("Checking for servers joined when the bot was offline..")
         var i = 0;
         this.Bot.guilds.forEach(guild => {
-            if (!this.config['waitingForFinalRegister'].includes(guild.id) && this.config['channels'][guild.id] === undefined) {
+            if (!this.loginConfig['waitingForFinalRegister'].includes(guild.id) && this.loginConfig['channels'][guild.id] === undefined) {
                 this.getDefaultChannel(guild)
-                    .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
-                this.config["waitingForFinalRegister"].push(guild.id)
+                    .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+                this.loginConfig["waitingForFinalRegister"].push(guild.id)
                 this.saveConfig()
                 i++;
             }
@@ -80,18 +88,32 @@ class BedrockUpdateBotManager {
 
         console.log("Checking for servers removed when the bot was offline..")
         var i = 0;
-        this.Bot.channelsToSend.forEach((data, id) => {
+        this.Bot.guildsToSend.forEach((data, id) => {
             if (!this.Bot.guilds.has(id)) {
                 i++;
-                if (this.config['channels'][id] !== null && this.config['channels'][id] !== undefined) {
-                    delete this.config['channels'][id]
-                    this.saveConfig()
-                    this.Bot.channelsToSend.delete(id)
+                if (this.loginConfig['channels'][id] !== null && this.loginConfig['channels'][id] !== undefined) {
+                    this.Bot.users.forEach(function (element) {
+                        if (element.id == botManager.loginConfig["ownerId"]) {
+                            element.send("taskStart guildId: " + id + ".");
+                        }
+                    });
+                    delete this.loginConfig['channels'][id]
+                    this.Bot.guildsToSend.delete(id)
                 }
             }
         })
+        this.saveConfig()
 
         console.log("Removed from " + i + " servers.")
+
+        console.log("Checking for servers not being in the waiting list anymore..")
+        this.loginConfig['waitingForFinalRegister'].forEach(function (element) {
+            let guild = botManager.Bot.guilds.get(element);
+            if (!guild) {
+                botManager.loginConfig["waitingForFinalRegister"] = botManager.loginConfig["waitingForFinalRegister"].filter(item => item !== element)
+            }
+        })
+        this.saveConfig()
 
         console.log('Scheduling Tasks..')
         let taskFolder = fs.readdirSync(path.join(__dirname, './../tasks'));
@@ -114,17 +136,16 @@ class BedrockUpdateBotManager {
     taskActivator() {
         var Bot = exports.Bot;
         if (!botManager.isDoingDisassembly) {
-            if (new Date().getDay() === 2 && new Date().getHours() === 19 && new Date().getMinutes() === 0) {
-                require('./../tasks/CheckMarketplaceTask.js').check(Bot);
+            if (new Date().getDay() === 2 && new Date().getHours() === 19 && new Date().getMinutes() === 0 && new Date().getSeconds() === 10) {
+                require('./../tasks/CheckMarketplaceTask.js').check(Bot, true);
+            }
+            if (new Date().getDay() !== botManager.config["lastSaveDay"]) {
+                botManager.copyFile("/home/MisteBot/MarketplaceData.json", "/var/www/html/MCPE/Marketplace/MarketplaceData-" + Date.now() + ".json")
+                botManager.config["lastSaveDay"] = new Date().getDay();
             }
             for (var [file, value] of Bot.tasks) {
                 if (value[0] == value[1]) {
-                    if (file === "CheckMarketplaceTask.js") {
-                        if (!this.isDoingMarketplaceCheck) {
-                            Bot.tasks.set(file, [value[0], 0]);
-                            require('./../tasks/' + file + '.js').check(Bot);
-                        }
-                    } else {
+                    if (!this.isDoingMarketplaceCheck) {
                         Bot.tasks.set(file, [value[0], 0]);
                         require('./../tasks/' + file + '.js').check(Bot);
                     }
@@ -136,7 +157,7 @@ class BedrockUpdateBotManager {
     }
 
     sendToChannels(type = "news", toSend) {
-        this.Bot.channelsToSend.forEach((data, id) => {
+        this.Bot.guildsToSend.forEach((data, id) => {
             var guildId = id;
             for (var key in data) {
                 var channelName = Object.keys(data[key])[0];
@@ -146,15 +167,17 @@ class BedrockUpdateBotManager {
                         if (requiredType == type) {
                             var channel = this.Bot.guilds.get(guildId).channels.find('name', channelName);
                             if (channel !== null && channel !== undefined) {
-                                channel.send(toSend)
-                                    .catch(() => function () {
-                                        this.getDefaultChannel(channel.guild)
-                                            .then(function (channelToSend) {
-                                                console.log("resent")
-                                                channelToSend.send(toSend)
-                                                channelToSend.send("Hey <@" + channel.guild.ownerID + "> !\nI don't have the perms to post in the channel '" + channel.name + "', can you give me the perms to post their ?")
-                                            })
-                                    })
+                                try {
+                                    channel.send(toSend)
+                                } catch (err) {
+                                    console.log(err)
+                                    this.getDefaultChannel(channel.guild)
+                                        .then(function (channelToSend) {
+                                            console.log("resent")
+                                            channelToSend.send(toSend)
+                                            channelToSend.send("Hey <@" + channel.guild.ownerID + "> !\nI don't have the perms to post in the channel '" + channel.name + "', can you give me the perms to post their ?")
+                                        })
+                                }
                             }
                         }
                     }
@@ -162,13 +185,13 @@ class BedrockUpdateBotManager {
             }
         });
         if (type === "news") {
-            botManager.config['waitingForFinalRegister'].forEach(function (element) {
+            botManager.loginConfig['waitingForFinalRegister'].forEach(function (element) {
                 var guild = botManager.Bot.guilds.get(element)
                 if (guild !== undefined) {
                     botManager.getDefaultChannel(guild)
                         .then(function (channel) {
                             channel.send(toSend)
-                            channel.send("Hey <@" + guild.ownerID + "> !\nYou didnt set any channel for me to post in so I posted in the first channel I found :(.\nYou can fix this problem by answering to this message 'The channel I chose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
+                            channel.send("Hey <@" + guild.ownerID + "> !\nYou didnt set any channel for me to post in so I posted in the first channel I found :(.\nYou can fix this problem by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
                         })
                 }
             })
@@ -178,6 +201,8 @@ class BedrockUpdateBotManager {
 
     saveConfig() {
         yaml_config.writeSync("./../../config.yml", this.config)
+        yaml_config.writeSync("./../../bot.yml", this.loginConfig)
+        botManager.copyFile("/home/MisteBot/config.yml", "/var/www/html/config.yml")
     }
 
     createNewConsoleMessage() {
@@ -252,6 +277,214 @@ class BedrockUpdateBotManager {
             .first();
     }
 
+    checkVersionAndDownload(message) {
+        let messageJson = JSON.parse(message.content.replace(/`/g, ""));
+        let needDownload = false;
+        for (var i = 0; i < messageJson.updates.length; i++) {
+            if (messageJson.updates[i].packageMoniker.includes("x64")) {
+                var versionObject = messageJson.updates[i];
+                break;
+            }
+        }
+        if (messageJson.isBeta === true) {
+            if (botManager.config["win10Versions"][versionObject.packageMoniker] === undefined) {
+                var versionName = (versionObject.packageMoniker.split("_")[1]);
+                var embed = new Discord.RichEmbed()
+                    .setTitle("New beta available on the Win10 Store: " + versionName)
+                    .setColor('#0941a9')
+                    .setAuthor("BedrockUpdateBot", botManager.avatarURL)
+                botManager.client.post('statuses/update', { status: '📌 A new version is out on the Windows Store for beta users: ' + versionName + " !\n\n#RT" }, function (error, tweet, response) {
+                    botManager.sendToChannels('news', embed)
+                    botManager.channelToDebugMcpe.send(embed)
+                });
+                botManager.config["win10Versions"][versionObject.packageMoniker] = [versionObject.serverId, versionObject.updateId];
+                botManager.saveConfig()
+                needDownload = true;
+            }
+        } else {
+            if (botManager.config["win10Versions"][versionObject.packageMoniker] === undefined) {
+                var versionName = (versionObject.packageMoniker.split("_")[1]);
+                var embed = new Discord.RichEmbed()
+                    .setTitle("New release available on the Win10 Store: " + versionName)
+                    .setColor('#0941a9')
+                    .setAuthor("BedrockUpdateBot", botManager.avatarURL)
+                botManager.client.post('statuses/update', { status: '📌 A new version is out on the Windows Store: ' + versionName + " !\n\n#RT" }, function (error, tweet, response) {
+                    botManager.sendToChannels('news', embed)
+                    embed.setURL("https://reset.mrarm.io/mcuwplink.php?id=" + versionObject.updateId)
+                    botManager.channelToDebugMcpe.send(embed)
+                });
+                botManager.config["win10Versions"][versionObject.packageMoniker] = [versionObject.serverId, versionObject.updateId];
+                botManager.saveConfig()
+                needDownload = true;
+            }
+        }
+        if (needDownload) {
+            var packageMoniker = versionObject.packageMoniker;
+            var url = versionObject.downloadUrl;
+            if (!fs.existsSync("MCPE/Windows/" + versionName + "/")) {
+                fs.mkdirSync("MCPE/Windows/" + versionName + "/")
+            }
+            var fStream = fs.createWriteStream("MCPE/Windows/" + versionName + "/" + packageMoniker + ".appx");
+            const request = http.get(url, function (response) {
+                response.pipe(fStream);
+            });
+
+            fStream.on('finish', function () {
+                client.scp("/home/MisteBot/MCPE/Windows/" + versionName + "/" + packageMoniker + ".appx", {
+                    host: botManager.loginConfig["localHOST"],
+                    username: botManager.loginConfig["localUSER"],
+                    password: botManager.loginConfig["localPASS"],
+                    path: '/media/HDD/MCPE/Windows/' + packageMoniker + '.appx'
+                }, function (err) {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        botManager.channelToDebugMcpe.send(versionName + ' available here: http://77.132.168.75/MCPE/Windows/' + packageMoniker + '.appx')
+                    }
+                })
+            })
+        }
+    }
+
+    getPatchNotesFrom(version, directlyId, callback) {
+        this.isCheckingPatchNotes = true;
+        if (directlyId) {
+            request({
+                url: "https://xforge.xboxlive.com/v2/catalog/items/" + version,
+                method: "GET",
+                json: true
+            }, function (error, response, body) {
+                if (!error && response.statusCode === 200) {
+
+                    let zipFile = fs.createWriteStream("patchNotes.zip");
+                    fs.createWriteStream("extractedPatchNotes.txt");
+
+                    let patchURL = body['contents'][0].url;
+
+                    https.get(body['contents'][0].url, function (response) {
+                        response.pipe(zipFile);
+                    });
+
+                    zipFile.on('finish', function () {
+                        let zip = new StreamZip({
+                            file: "patchNotes.zip",
+                            storeEntries: true
+                        });
+
+                        zip.on('ready', () => {
+                            for (const entry of Object.values(zip.entries())) {
+                                if (entry.name === "patch_notes_en_GB.txt") {
+                                    zip.extract(entry.name, "extractedPatchNotes.txt", err => {
+                                        console.log(err ? 'Extract error' : 'Extracted');
+
+                                        fs.readFile("extractedPatchNotes.txt", 'utf8', function (err, data) {
+                                            let patchText = data;
+
+                                            zip.close()
+                                            fs.unlinkSync("patchNotes.zip");
+                                            fs.unlinkSync("extractedPatchNotes.txt");
+
+                                            botManager.isCheckingPatchNotes = false;
+                                            callback(["", patchText, patchURL]);
+                                        });
+                                    })
+                                    break;
+                                }
+                            }
+                        })
+                    })
+                } else {
+                    botManager.isCheckingPatchNotes = false;
+                    callback(null);
+                }
+            })
+        } else {
+            let jsonObject = { "count": true, "filter": "(contentType eq 'PatchNotes') and platforms/any(p: p eq 'uwp.store') and (tags/any(t: t eq '" + version + "'))", "orderBy": "startDate desc", "scid": "4fc10100-5f7a-4470-899b-280835760c07", "top": 25 }
+            request({
+                url: "https://xforge.xboxlive.com/v2/catalog/items/search",
+                method: "POST",
+                body: jsonObject,
+                json: true
+            }, function (error, response, body) {
+                if (!error && response.statusCode === 200) {
+                    if (body.count > 0) {
+                        var patchId = body.results[0].id;
+                        var patchDescription = body.results[0].description.neutral;
+                        request({
+                            url: "https://xforge.xboxlive.com/v2/catalog/items/" + patchId,
+                            method: "GET",
+                            json: true
+                        }, function (error, response, body) {
+                            if (!error && response.statusCode === 200) {
+
+                                let zipFile = fs.createWriteStream("patchNotes.zip");
+                                fs.createWriteStream("extractedPatchNotes.txt");
+
+                                let patchURL = body['contents'][0].url;
+
+                                https.get(body['contents'][0].url, function (response) {
+                                    response.pipe(zipFile);
+                                });
+
+                                zipFile.on('finish', function () {
+                                    let zip = new StreamZip({
+                                        file: "patchNotes.zip",
+                                        storeEntries: true
+                                    });
+
+                                    zip.on('ready', () => {
+                                        for (const entry of Object.values(zip.entries())) {
+                                            if (entry.name === "patch_notes_en_GB.txt") {
+                                                zip.extract(entry.name, "extractedPatchNotes.txt", err => {
+                                                    console.log(err ? 'Extract error' : 'Extracted');
+
+                                                    fs.readFile("extractedPatchNotes.txt", 'utf8', function (err, data) {
+                                                        let patchText = data;
+
+                                                        zip.close()
+                                                        fs.unlinkSync("patchNotes.zip");
+                                                        fs.unlinkSync("extractedPatchNotes.txt");
+
+                                                        botManager.isCheckingPatchNotes = false;
+                                                        callback([patchDescription, patchText, patchURL]);
+                                                    });
+                                                })
+                                                break;
+                                            }
+                                        }
+                                    })
+                                })
+                            } else {
+                                botManager.isCheckingPatchNotes = false;
+                                callback(null);
+                            }
+                        })
+                    } else {
+                        botManager.isCheckingPatchNotes = false;
+                        callback(null);
+                    }
+                } else {
+                    botManager.isCheckingPatchNotes = false;
+                    callback(null);
+                }
+            })
+        }
+    }
+
+    copyFile(source, target) {
+        var rd = fs.createReadStream(source);
+        var wr = fs.createWriteStream(target);
+        return new Promise(function (resolve, reject) {
+            rd.on('error', reject);
+            wr.on('error', reject);
+            wr.on('finish', resolve);
+            rd.pipe(wr);
+        }).catch(function (error) {
+            rd.destroy();
+            wr.end();
+            throw error;
+        });
+    }
 }
 
 module.exports = BedrockUpdateBotManager;

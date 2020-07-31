@@ -12,7 +12,7 @@ class CheckBedrockServerTask {
     }
 
     static check(Bot) {
-        var url = "http://145.239.47.15/BedrockServer.php"
+        var url = "http://194.9.172.113/BedrockServer.php"
         request({
             url: url,
             json: true
@@ -29,7 +29,7 @@ class CheckBedrockServerTask {
                         var embed = new Discord.RichEmbed()
                             .setTitle('A new version of the BedrockServer Win10 is available for: ' + win10Version + " :pushpin:")
                             .setColor('#0941a9')
-                        botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Win10 is available for: ' + win10Version + " !\n\n#RT" }, function (error, tweet, response) {
+                        botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Win10 is available for: ' + win10Version + " !" }, function (error, tweet, response) {
                             botManager.sendToChannels('news', embed)
                             botManager.Bot.users.forEach(function (element) {
                                 if (element.id == botManager.config['ownerId']) {
@@ -45,14 +45,14 @@ class CheckBedrockServerTask {
                         botManager.config["BSLinux"] = body[1];
                         botManager.saveConfig()
 
-                        var embed = new Discord.RichEmbed()
+                        var embedLinux = new Discord.RichEmbed()
                             .setTitle('A new version of the BedrockServer Linux is available for: ' + linuxVersion + " :pushpin:")
                             .setColor('#0941a9')
-                        botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Linux is available for: ' + linuxVersion + " !\n\n#RT" }, function (error, tweet, response) {
-                            botManager.sendToChannels('news', embed)
+                        botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Linux is available for: ' + linuxVersion + " !" }, function (error, tweet, response) {
+                            botManager.sendToChannels('news', embedLinux)
                             botManager.Bot.users.forEach(function (element) {
                                 if (element.id == botManager.config['ownerId']) {
-                                    element.send(embed);
+                                    element.send(embedLinux);
                                 }
                             });
                         });
