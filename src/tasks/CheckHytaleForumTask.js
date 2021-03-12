@@ -24,7 +24,7 @@ class CheckHytaleForumTask {
                     botManager.config["lastHytalePost"] = botManager.config["lastHytalePost2"];
                     botManager.config["lastHytalePost"] = body[0].title;
                     botManager.saveConfig()
-                    var embed = new Discord.RichEmbed()
+                    var embed = new Discord.MessageEmbed()
                         .setTitle(body[0].title)
                         .setDescription(entities.decode(body[0].bodyExcerpt))
                         .setColor('#0941a9')
@@ -37,11 +37,7 @@ class CheckHytaleForumTask {
                     });
                 }
             } else {
-                Bot.users.forEach(function (element) {
-                    if (element.id == botManager.config['ownerId']) {
-                        element.send("Hytale Task error.");
-                    }
-                });
+                botManager.sendToMiste("Hytale Task error.")
             }
         })
     }

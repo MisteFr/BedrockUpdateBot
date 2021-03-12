@@ -49,7 +49,7 @@ class CheckGooglePlayVersionTask {
                         botManager.saveConfig()
     
                         
-                        var embed = new Discord.RichEmbed()
+                        var embed = new Discord.MessageEmbed()
                             .setTitle(`A new version is out on the Google Play Store for beta users: ` + betaVersion + " :pushpin:")
                             .setDescription(res[0].details.appDetails.recentChangesHtml.replace(/<br\s*\/?>/gi, ' '))
                             .setColor('#0941a9')
@@ -120,7 +120,7 @@ class CheckGooglePlayVersionTask {
                         botManager.config["lastVersionReleasedIsBeta"] = false;
                         botManager.saveConfig()
     
-                        var embed = new Discord.RichEmbed()
+                        var embed = new Discord.MessageEmbed()
                             .setTitle(`A new version is out on the Google Play Store: ` + botManager.config["lastVersionAndroid"] + " :pushpin:")
                             .setDescription(res[0].details.appDetails.recentChangesHtml.replace(/<br\s*\/?>/gi, ' '))
                             .setColor('#0941a9')

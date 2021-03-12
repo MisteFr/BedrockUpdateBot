@@ -30,7 +30,7 @@ class ContentCommand {
                         if ((pieceOfContent.title.neutral).toLowerCase() === name.toLowerCase()) {
                             found = true;
 
-                            var embed = new Discord.RichEmbed()
+                            var embed = new Discord.MessageEmbed()
                                 .setTitle(pieceOfContent.title.neutral)
                                 .setDescription(pieceOfContent.description.neutral)
                                 .setImage(pieceOfContent.images[0].url)

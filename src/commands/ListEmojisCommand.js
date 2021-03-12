@@ -1,6 +1,3 @@
-const Discord = require('discord.js');
-var request = require('request');
-
 class ListEmojisCommand {
     static getName() {
         return 'listemojis';
@@ -15,7 +12,7 @@ class ListEmojisCommand {
     }
 
     static executeCommand(message) {
-        message.channel.send(message.guild.emojis.map(e => e.toString()).join(" "));
+        message.channel.send(message.guild.emojis.cache.map(e => e.toString()).join(" "));
     }
 }
 

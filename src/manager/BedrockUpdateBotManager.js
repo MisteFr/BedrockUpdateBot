@@ -11,6 +11,8 @@ var http = require('http');
 var client = require('scp2')
 const StreamZip = require('node-stream-zip');
 var request = require('request');
+var Long = require("long");
+
 class BedrockUpdateBotManager {
 
     constructor() {
@@ -37,7 +39,9 @@ class BedrockUpdateBotManager {
         this.isDoingMarketplaceCheck = false;
         this.isCheckingPatchNotes = false;
 
-        Bot.user.setActivity("Mojang | >help | " + this.Bot.guilds.size + " guilds", { type: ("WATCHING") });
+        Bot.users.fetch("198825092547870721", true)
+
+        Bot.user.setActivity("Mojang | >help | " + this.Bot.guilds.cache.size + " guilds", { type: ("WATCHING") });
 
         console.log('Logging in Twitter..')
         this.client = new Twitter({
@@ -54,9 +58,7 @@ class BedrockUpdateBotManager {
             access_token_secret: loginConfig["hytaleTwitter"]["access_token_secret"]
         });
 
-        //this.channelToDebugMcpe = Bot.guilds.get(this.config['specialId']).channels.get('428631827297599499');
-        this.channelToDebugMcpe = Bot.guilds.get('419294780921479178').channels.get('614121817765838848');
-
+        this.channelToDebugMcpe = Bot.guilds.cache.get('419294780921479178').channels.cache.get('614121817765838848');
 
         console.log('Registering commands..')
         this.Bot.commands = new Discord.Collection();
@@ -74,10 +76,10 @@ class BedrockUpdateBotManager {
 
         console.log("Checking for servers joined when the bot was offline..")
         var i = 0;
-        this.Bot.guilds.forEach(guild => {
+        this.Bot.guilds.cache.forEach(guild => {
             if (!this.loginConfig['waitingForFinalRegister'].includes(guild.id) && this.loginConfig['channels'][guild.id] === undefined) {
-                this.getDefaultChannel(guild)
-                    .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+                const defaultChannel = this.getDefaultChannel(guild)
+                defaultChannel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
                 this.loginConfig["waitingForFinalRegister"].push(guild.id)
                 this.saveConfig()
                 i++;
@@ -89,14 +91,10 @@ class BedrockUpdateBotManager {
         console.log("Checking for servers removed when the bot was offline..")
         var i = 0;
         this.Bot.guildsToSend.forEach((data, id) => {
-            if (!this.Bot.guilds.has(id)) {
+            if (!this.Bot.guilds.cache.has(id)) {
                 i++;
                 if (this.loginConfig['channels'][id] !== null && this.loginConfig['channels'][id] !== undefined) {
-                    this.Bot.users.forEach(function (element) {
-                        if (element.id == botManager.loginConfig["ownerId"]) {
-                            element.send("taskStart guildId: " + id + ".");
-                        }
-                    });
+                    this.sendToMiste("taskStart guildId: " + id + ".")
                     delete this.loginConfig['channels'][id]
                     this.Bot.guildsToSend.delete(id)
                 }
@@ -108,7 +106,7 @@ class BedrockUpdateBotManager {
 
         console.log("Checking for servers not being in the waiting list anymore..")
         this.loginConfig['waitingForFinalRegister'].forEach(function (element) {
-            let guild = botManager.Bot.guilds.get(element);
+            let guild = botManager.Bot.guilds.cache.get(element);
             if (!guild) {
                 botManager.loginConfig["waitingForFinalRegister"] = botManager.loginConfig["waitingForFinalRegister"].filter(item => item !== element)
             }
@@ -123,8 +121,9 @@ class BedrockUpdateBotManager {
             this.Bot.tasks.set(task.getName(), [task.getDelay(), task.getDelay()]);
         }
         Repeat(this.taskActivator).every('1000', 'ms').start.in('1', 'sec')
-
+        
         console.log('I am ready!');
+        this.sendToMiste("Bot started.")
     }
 
 
@@ -165,18 +164,18 @@ class BedrockUpdateBotManager {
                     for (var key3 in Object.values(data[key])[key2]) {
                         var requiredType = Object.values(data[key])[key2][key3];
                         if (requiredType == type) {
-                            var channel = this.Bot.guilds.get(guildId).channels.find('name', channelName);
+                            var channel = this.Bot.guilds.cache.get(guildId).channels.cache.find(channel => channel.name === channelName);
                             if (channel !== null && channel !== undefined) {
+
                                 try {
                                     channel.send(toSend)
                                 } catch (err) {
-                                    console.log(err)
-                                    this.getDefaultChannel(channel.guild)
-                                        .then(function (channelToSend) {
-                                            console.log("resent")
-                                            channelToSend.send(toSend)
-                                            channelToSend.send("Hey <@" + channel.guild.ownerID + "> !\nI don't have the perms to post in the channel '" + channel.name + "', can you give me the perms to post their ?")
-                                        })
+                                    const defaultChannel = this.getDefaultChannel(channel.guild)
+                                    if(defaultChannel !== null && defaultChannel !== 'undefined'){
+                                        console.log(defaultChannel)
+                                        defaultChannel.send(toSend)
+                                        defaultChannel.send("Hey <@" + defaultChannel.guild.ownerID + "> !\nI don't have the perms to post in the channel '" + defaultChannel.name + "', can you give me the perms to post their ?")
+                                    }
                                 }
                             }
                         }
@@ -186,13 +185,17 @@ class BedrockUpdateBotManager {
         });
         if (type === "news") {
             botManager.loginConfig['waitingForFinalRegister'].forEach(function (element) {
-                var guild = botManager.Bot.guilds.get(element)
-                if (guild !== undefined) {
-                    botManager.getDefaultChannel(guild)
-                        .then(function (channel) {
-                            channel.send(toSend)
-                            channel.send("Hey <@" + guild.ownerID + "> !\nYou didnt set any channel for me to post in so I posted in the first channel I found :(.\nYou can fix this problem by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
-                        })
+                var guild = botManager.Bot.guilds.cache.get(element)
+                if (guild !== undefined) { 
+                    const defaultChannel2 = botManager.getDefaultChannel(guild)
+                    if(defaultChannel2 !== null && defaultChannel2 !== 'undefined' && typeof defaultChannel2 !== 'undefined'){
+                        try {
+                            defaultChannel2.send(toSend)
+                            defaultChannel2.send("Hey <@" + guild.ownerID + "> !\nYou didnt set any channel for me to post in so I posted in the first channel I found :(.\nYou can fix this problem by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
+                        } catch (err) {
+                            console.log(err)
+                        }
+                    }
                 }
             })
         }
@@ -211,7 +214,7 @@ class BedrockUpdateBotManager {
     }
 
     updateConsole(content) {
-        this.channelToDebugMcpe.fetchMessages({ limit: 50 }).then(messages => {
+        this.channelToDebugMcpe.messages.fetch({ limit: 50 }).then(messages => {
             let messagesArr = messages.array();
             let messageCount = messagesArr.length;
             let i2 = 0;
@@ -223,6 +226,14 @@ class BedrockUpdateBotManager {
                     }
                     i2++;
                 }
+            }
+        });
+    }
+
+    sendToMiste(message){
+        this.Bot.users.cache.forEach(function (element) {
+            if (element.id == botManager.loginConfig["ownerId"]) {
+                element.send(message);
             }
         });
     }
@@ -262,19 +273,23 @@ class BedrockUpdateBotManager {
         while (new Date().getTime() < now + sleepDuration) { /* do nothing (doesnt affect the child process)*/ }
     }
 
-    async getDefaultChannel(guild) {
-        if (guild.channels.has(guild.id))
-            return guild.channels.get(guild.id)
-
-        if (guild.channels.exists("name", "general"))
-            return guild.channels.find("name", "general");
-
-        return guild.channels
-            .filter(c => c.type === "text" &&
-                c.permissionsFor(guild.client.user).has("SEND_MESSAGES"))
-            .sort((a, b) => a.position - b.position ||
-                Long.fromString(a.id).sub(Long.fromString(b.id)).toNumber())
-            .first();
+    getDefaultChannel = (guild) => {
+        // get "original" default channel
+        if(guild.channels.cache.has(guild.id))
+          return guild.channels.cache.get(guild.id)
+      
+        // Check for a "general" channel, which is often default chat
+        const generalChannel = guild.channels.cache.find(channel => channel.name === "general");
+        if (generalChannel)
+          return generalChannel;
+        // Now we get into the heavy stuff: first channel in order where the bot can speak
+        // hold on to your hats!
+        return guild.channels.cache
+         .filter(c => c.type === "text" &&
+           c.permissionsFor(guild.client.user).has("SEND_MESSAGES"))
+         .sort((a, b) => a.position - b.position ||
+           Long.fromString(a.id).sub(Long.fromString(b.id)).toNumber())
+         .first();
     }
 
     checkVersionAndDownload(message) {

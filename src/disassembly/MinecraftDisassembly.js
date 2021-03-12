@@ -1,7 +1,5 @@
 require('./../BedrockUpdateBot.js');
 const fs = require('fs');
-const getUrls = require('get-urls');
-const https = require('https');
 const StreamZip = require('node-stream-zip');
 const JsDiff = require('diff');
 const github = require('octonode');
@@ -46,10 +44,10 @@ class MinecraftDisassembly {
                                 zip.close();
                                 console.log('Getting the packets list');
                                 const { exec } = require('child_process');
-                                exec(botManager.config["lastVersionReleasedIsBeta"] ? "python protocol.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python protocol.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 5000 }, (err, stdout, stderr) => {
+                                exec(botManager.config["lastVersionReleasedIsBeta"] ? "python scripts/protocol.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python scripts/protocol.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 5000 }, (err, stdout, stderr) => {
                                     var protocol = stdout.replace(/\s/g, '');
 
-                                    exec(botManager.config["lastVersionReleasedIsBeta"] ? "python packets.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python packets.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 5000 }, (err, stdout, stderr) => {
+                                    exec(botManager.config["lastVersionReleasedIsBeta"] ? "python scripts/packets.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python scripts/packets.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 5000 }, (err, stdout, stderr) => {
                                         if (err) {
                                             console.log(err.message)
                                             return;
@@ -383,7 +381,7 @@ class MinecraftDisassembly {
 
                                             console.log('Extracting WSS Events');
 
-                                            exec(botManager.config["lastVersionReleasedIsBeta"] ? "python wssEvents.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python wssEvents.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 5000 }, (err, stdout, stderr) => {
+                                            exec(botManager.config["lastVersionReleasedIsBeta"] ? "python scripts/wssEvents.py MCPE/Beta/" + botManager.config["lastVersionAndroidBeta"] + "/" + botManager.config["lastVersionAndroidBeta"] + ".so" : "python scripts/wssEvents.py MCPE/Release/" + botManager.config["lastVersionAndroid"] + "/" + botManager.config["lastVersionAndroid"] + ".so", { maxBuffer: 1024 * 5000 }, (err, stdout, stderr) => {
                                                 if (err) {
                                                     console.log(err.message)
                                                     return;

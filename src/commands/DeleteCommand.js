@@ -22,9 +22,9 @@ class DeleteCommand {
                     for (var key3 in Object.values(data[key])[key2]) {
                         var requiredType = Object.values(data[key])[key2][key3];
                         if (requiredType == "news" || requiredType == "debug") {
-                            var channel = botManager.Bot.guilds.get(guildId).channels.find('name', channelName);
+                            var channel = botManager.Bot.guilds.cache.get(guildId).channels.cache.find(channel => channel.name === channelName);
                             if (channel !== null && channel !== undefined) {
-                                channel.fetchMessages({ limit: 100 }).then(messages => {
+                                channel.messages.fetch({ limit: 100 }).then(messages => {
                                     let messagesArr = messages.array();
                                     let messageCount = messagesArr.length;
                                     let i2 = 0;

@@ -1,14 +1,11 @@
 require('./../BedrockUpdateBot.js');
 const fs = require('fs');
-const getUrls = require('get-urls');
 const https = require('https');
 const StreamZip = require('node-stream-zip');
-const JsDiff = require('diff');
 const github = require('octonode');
 
 
 class BedrockServerDisassembly {
-
     static run(url, version) {
         botManager.isDoingDisassembly = true;
         if (!fs.existsSync("MCPE/Release/" + version + "/")) {
@@ -35,7 +32,7 @@ class BedrockServerDisassembly {
                             zip.extract('bedrock_server', "MCPE/Release/" + version + "/BedrockServer/" + version, err => {
                                 zip.close();
                                 const { exec } = require('child_process');
-                                exec("readelf -Ws MCPE/Release/" + version + "/BedrockServer/" + version, { maxBuffer: 2048 * 100000 }, (err, stdout, stderr) => {
+                                exec("readelf -Ws MCPE/Release/" + version + "/BedrockServer/" + version, { maxBuffer: 5048 * 100000 }, (err, stdout, stderr) => {
                                     if (err) {
                                         console.log(err.message)
                                         return;
@@ -129,26 +126,33 @@ class BedrockServerDisassembly {
                                     }
 
                                     console.log("Uploading symbol list (BedrockServer)")
-
+                                    
                                     var githubClient = github.client(botManager.config['githubToken']);
+                                        
+                                      
                                     githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents("release/" + version + "/BedrockServer/" + version + "_info.md", "Adding symbols diffs from " + version + " Bedrock Server", infoText, (err, data) => {
                                         if (err) {
-                                            botManager.channelToDebugMcpe.send('\nError while trying to update the version infos  of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);
-                                            return console.error("error" + err);
+                                            botManager.sendToMiste('\nError while trying to update the version infos of this version (' + version + ') (BedrockServer). Error message: ' + err.message);
+                                            return console.error("error: " + err);
                                         } else {
+                                            /*
+                                            Not really useful
                                             githubClient.repo('MisteFr/minecraft-bedrock-documentation').createContents("release/" + version + "/BedrockServer/" + version + "_symbols.md", "Adding symbols bump from " + version + " Bedrock Server.", stdout, (err, data) => {
                                                 if (err) {
-                                                    botManager.channelToDebugMcpe.send('\nError while trying to update the symbols dump of this version (' + botManager.config['lastVersionAndroid'] + ') (BedrockServer). Error message: ' + err.message);
+                                                    botManager.sendToMiste('\nError while trying to update the symbols dump of this version (' + version + ') (BedrockServer). Error message: ' + err.message);
                                                     return console.error(err);
                                                 }
                                             });
+                                            */
                                         }
                                         console.log(data.content.html_url);
                                         botManager.sendToChannels('pmmp', 'Uploaded the version infos of ' + version + ' (BedrockServer) here: ' + data.content.html_url)
-                                        botManager.channelToDebugMcpe.send('Uploaded the version infos of ' + version + ' (BedrockServer) here: ' + data.content.html_url)
+                                        botManager.sendToMiste('Uploaded the version infos of ' + version + ' (BedrockServer) here: ' + data.content.html_url)
                                     });
+                                    
 
                                     config["BSsymbolsListRelease"] = stdout;
+                                    botManager.config["lastVersionAndroid"] = version
                                     botManager.saveConfig()
                                     yaml_config.writeSync("./../../dissasembly.yml", config)
                                     botManager.isDoingDisassembly = false;

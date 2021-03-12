@@ -26,16 +26,13 @@ class CheckBedrockServerTask {
                         botManager.config["BSWin10"] = body[0];
                         botManager.saveConfig()
 
-                        var embed = new Discord.RichEmbed()
+                        var embed = new Discord.MessageEmbed()
                             .setTitle('A new version of the BedrockServer Win10 is available for: ' + win10Version + " :pushpin:")
                             .setColor('#0941a9')
+                            
                         botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Win10 is available for: ' + win10Version + " !" }, function (error, tweet, response) {
                             botManager.sendToChannels('news', embed)
-                            botManager.Bot.users.forEach(function (element) {
-                                if (element.id == botManager.config['ownerId']) {
-                                    element.send(embed);
-                                }
-                            });
+                            botManager.sendToMiste(embed)
                         });
                     }
                     if (body[1] !== botManager.config['BSLinux'] && body[1] !== botManager.config['BSLinux2']) {
@@ -45,25 +42,18 @@ class CheckBedrockServerTask {
                         botManager.config["BSLinux"] = body[1];
                         botManager.saveConfig()
 
-                        var embedLinux = new Discord.RichEmbed()
+                        var embedLinux = new Discord.MessageEmbed()
                             .setTitle('A new version of the BedrockServer Linux is available for: ' + linuxVersion + " :pushpin:")
                             .setColor('#0941a9')
+
                         botManager.client.post('statuses/update', { status: '📌 A new version of the BedrockServer Linux is available for: ' + linuxVersion + " !" }, function (error, tweet, response) {
                             botManager.sendToChannels('news', embedLinux)
-                            botManager.Bot.users.forEach(function (element) {
-                                if (element.id == botManager.config['ownerId']) {
-                                    element.send(embedLinux);
-                                }
-                            });
+                            botManager.sendToMiste(embedLinux)
                         });
                         require('./../disassembly/BedrockServerDisassembly.js').run(body[1], linuxVersion);
                     }
                 } else {
-                    Bot.users.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
-                            element.send("Incorrect body length for BedrockServer array !");
-                        }
-                    });
+                    botManager.sendToMiste("Incorrect body length for BedrockServer array !")
                 }
             }
         })

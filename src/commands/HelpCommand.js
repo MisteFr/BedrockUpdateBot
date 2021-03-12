@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 require('./../BedrockUpdateBot.js');
 
 class HelpCommand {
@@ -36,8 +35,12 @@ class HelpCommand {
                         value: "Set up a channel to receive documentation updates."
                     },
                     {
-                        name: ">mcpe <ip:port>",
-                        value: "Query a MCPE server to get information regarding player count, etc."
+                        name: ">mcpe <ip> <port>",
+                        value: "Query a Minecraft Bedrock server to get information regarding player count, etc."
+                    },
+                    {
+                        name: ">mcpc <ip> <port>",
+                        value: "Query a Minecraft Java server to get information regarding player count, etc."
                     },
                     {
                         name: ">latestMc",

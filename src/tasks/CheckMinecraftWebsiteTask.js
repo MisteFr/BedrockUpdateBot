@@ -21,7 +21,7 @@ class CheckMinecraftWebsiteTask {
             if (!error && response.statusCode === 200) {
                 var toCheck = botManager.config["textContainingTitles"];
                 body["article_grid"].forEach(function (element) {
-                    if (!(toCheck.includes(element["default_tile"]["title"]))) {
+                    if (!(toCheck.includes(element["default_tile"]["title"])) && botManager.config["lastWebsiteArticle"] !== element["default_tile"]["title"]) {
                         console.log(element["default_tile"]["title"]);
                         botManager.config["textContainingTitles"] += element["default_tile"]["title"] + ", ";
 
@@ -29,7 +29,7 @@ class CheckMinecraftWebsiteTask {
                         botManager.config["lastWebsiteArticle"] = element["default_tile"]["title"];
                         botManager.saveConfig()
 
-                        var embed = new Discord.RichEmbed()
+                        var embed = new Discord.MessageEmbed()
                             .setTitle(botManager.config["lastWebsiteArticle"] + " :pushpin:")
                             .setDescription('**' + element["default_tile"]["sub_header"] + '**')
                             .setColor('#0941a9')

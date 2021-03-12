@@ -1,7 +1,6 @@
 require('./../BedrockUpdateBot.js')
 var request = require('request');
 const Discord = require('discord.js');
-var https = require('https');
 
 class CheckTeamMojangChannelTask {
     static getDelay() {
@@ -20,7 +19,7 @@ class CheckTeamMojangChannelTask {
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 if (body["title"] != botManager.config["latestVideo"] && body["title"] != botManager.config["latestVideo2"] && typeof body["title"] !== 'undefined' && body !== "null") {
-                    const embed = new Discord.RichEmbed()
+                    const embed = new Discord.MessageEmbed()
                         .setTitle("A new video is out on the TeamMojang channel ! :pushpin:")
                         .setColor('#0941a9')
                         .setDescription("**Title**: " + body["title"] + "\n**Description**: " + body["description"])

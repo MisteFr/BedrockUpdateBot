@@ -12,33 +12,26 @@ Bot.on('ready', () => {
 });
 
 Bot.on('error', e => {
-  Bot.users.forEach(function (element) {
-    if (element.id == botManager.config['ownerId']) {
-      element.send("[ERROR] " + e.message);
-    }
-  });
+  console.log(e)
+  botManager.sendToMiste("[ERROR] " + e.message)
 });
 
 Bot.on("guildCreate", guild => {
   if(botManager.loginConfig['channels'][guild.id] == undefined){
-    guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
-    Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
+    //guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
+    Bot.user.setActivity("Mojang | >help | " + Bot.guilds.cache.size + " guilds", { type: ("WATCHING") });
     console.log(guild.name)
-    botManager.getDefaultChannel(guild)
-      .then(channel => channel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+    const defaultChannel = botManager.getDefaultChannel(guild)
+    defaultChannel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
     botManager.loginConfig["waitingForFinalRegister"].push(guild.id)
     botManager.saveConfig()
-    Bot.users.forEach(function (element) {
-      if (element.id == botManager.config['ownerId']) {
-        element.send("Added on " + guild.name + " owned by " + guild.owner.user.username + ".");
-      }
-    });
+    if(guild.owner === null){
+      botManager.sendToMiste("Added on " + guild.name + ".")
+    }else{
+      botManager.sendToMiste("Added on " + guild.name + " owned by " + guild.owner.user.username + ".")
+    }
   }else{
-    Bot.users.forEach(function (element) {
-      if (element.id == botManager.config['ownerId']) {
-        element.send("Back from outage: " + guild.name + ".");
-      }
-    });
+    botManager.sendToMiste("Back from outage: " + guild.name + ".")
   }
 })
 
@@ -56,18 +49,14 @@ Bot.on("guildDelete", guild => {
       botManager.loginConfig["waitingForFinalRegister"] = botManager.loginConfig["waitingForFinalRegister"].filter(item => item !== guild.id)
       botManager.saveConfig()
     }
-    Bot.user.setActivity("Mojang | >help | " + Bot.guilds.size + " guilds", { type: ("WATCHING") });
-    Bot.users.forEach(function (element) {
-      if (element.id == botManager.config["ownerId"]) {
-        element.send("Removed from " + guild.name + " owned by " + guild.owner.user.username + ".");
-      }
-    });
+    Bot.user.setActivity("Mojang | >help | " + Bot.guilds.cache.size + " guilds", { type: ("WATCHING") });
+    if(guild.owner === null){
+      botManager.sendToMiste("Removed from " + guild.name + ".")
+    }else{
+      botManager.sendToMiste("Removed from " + guild.name + " owned by " + guild.owner.user.username + ".")
+    }
   }else{
-    Bot.users.forEach(function (element) {
-      if (element.id == botManager.config["ownerId"]) {
-        element.send("Outage for " + guild.name + ".");
-      }
-    });
+    botManager.sendToMiste("Outage for " + guild.name + ".")
   }
 })
 
@@ -107,9 +96,11 @@ Bot.on("channelDelete", channel => {
         }
         botManager.loginConfig["waitingForFinalRegister"].push(channel.guild.id)
         botManager.saveConfig()
-        channel.guild.owner.user.send("Hey !\nYou just removed the channel where I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
-        botManager.getDefaultChannel(channel.guild)
-          .then(defaultChannel => defaultChannel.send("Hey <@" + channel.guild.ownerID + "> !\nYou just removed the channel I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+        if(channel.guild.owner){
+          channel.guild.owner.user.send("Hey !\nYou just removed the channel where I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
+        }
+        const defaultChannel = botManager.getDefaultChannel(channel.guild)
+        defaultChannel.send("Hey <@" + defaultChannel.guild.ownerID + "> !\nYou just removed the channel I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
         }
       } else {
         var newObject = [];
@@ -125,9 +116,11 @@ Bot.on("channelDelete", channel => {
             if ((Object.values(element)[0]).includes("news")) {
               botManager.loginConfig["waitingForFinalRegister"].push(channel.guild.id)
               botManager.saveConfig()
-              channel.guild.owner.user.send("Hey !\nYou just removed the channel where I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
-              botManager.getDefaultChannel(channel.guild)
-                .then(defaultChannel => defaultChannel.send("Hey <@" + channel.guild.ownerID + "> !\nYou just removed the channel I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"))
+              if(channel.guild.owner){
+                channel.guild.owner.user.send("Hey !\nYou just removed the channel where I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**"); 
+              }
+              const defaultChannel = botManager.getDefaultChannel(channel.guild)
+              defaultChannel.send("Hey <@" + defaultChannel.guild.ownerID + "> !\nYou just removed the channel I was posting in the latest news :(\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
             }
           }
         })
@@ -164,7 +157,7 @@ Bot.on('message', message => {
       }
 
       var nameOfTheChannel = (message.content.replace("The channel I choose is", "")).replace(/\s/g, '');
-      var channelChose = Bot.guilds.get(message.guild.id).channels.find('name', nameOfTheChannel);
+      var channelChose = Bot.guilds.cache.get(message.guild.id).channels.cache.find('name', nameOfTheChannel);
       if (channelChose !== null && channelChose !== undefined) {
         if (message.author.id === message.guild.ownerID) {
           var objectToSave = {}
@@ -187,14 +180,9 @@ Bot.on('message', message => {
     if (message.content === (botManager.needConfirmationAuthor + " confirms that he wants to stop this bot")) {
       message.channel.send(message.author.username + " is stopping the bot !")
       message.channel.send("Shutting down ...")
-      Bot.users.forEach(function (element) {
-        if (element.id == botManager.config['ownerId']) {
-          element.send(message.author.username + " is stopping the bot !")
-        }
-      });
+      botManager.sendToMiste(message.author.username + " is stopping the bot !")
 
       Bot.destroy();
-
     }
   }
 
@@ -209,7 +197,6 @@ Bot.on('message', message => {
   if (message.content.includes("doubt") && message.content.length < 7) {
     message.react("🇽")
   }
-  var args = message.content.split(" ").slice(1);
 
   if (!message.content.startsWith('>') || message.author.bot) return;
   let realargs = message.content.slice('>'.length).split(/ +/);

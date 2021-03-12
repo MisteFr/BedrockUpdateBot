@@ -30,7 +30,7 @@ class CheckFeaturedServerList {
                             botManager.config["featuredServersCount"] = body.count;
                             botManager.saveConfig()
 
-                            var embed = new Discord.RichEmbed()
+                            var embed = new Discord.MessageEmbed()
                                 .setTitle('A new featured server is available on MCBE: ' + body.results[key].title.neutral + " :pushpin:")
                                 .setDescription("IP: " + body.results[key].displayProperties.url + "\nPort: " + body.results[key].displayProperties.port + "\nCreator name: " + body.results[key].displayProperties.creatorName)
                                 .setColor('#0941a9')
@@ -41,11 +41,7 @@ class CheckFeaturedServerList {
                     }
                 }
             } else {
-                Bot.users.forEach(function (element) {
-                    if (element.id == botManager.config['ownerId']) {
-                        element.send("Server list return failed.");
-                    }
-                });
+                botManager.sendToMiste("Server list return failed.")
             }
         })
     }

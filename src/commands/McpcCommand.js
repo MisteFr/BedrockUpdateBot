@@ -1,14 +1,14 @@
 const Discord = require('discord.js');
 var util = require('minecraft-server-util');
-require('./../BedrockUpdateBot.js');
+require('../BedrockUpdateBot.js');
 
 class LatestMcpeCommand {
     static getName() {
-        return 'mcpe';
+        return 'mcpc';
     }
 
     static getDescription() {
-        return 'Ping a server';
+        return 'Ping a minecraft java server';
     }
 
     static getPermission() {
@@ -18,17 +18,17 @@ class LatestMcpeCommand {
     static executeCommand(message) {
         let args = message.content.split(' ')
         if(!args[2]){
-            message.channel.send('Please give a port to query (>mcpe <ip> <port>).')
+            message.channel.send('Please give a port to query (>mcpc <ip> <port>).')
             return
         }
-        util.statusBedrock(args[1], { port: parseInt(args[2]), enableSRV: true, timeout: 7000 })
+        util.status(args[1], { port: parseInt(args[2]), enableSRV: true, timeout: 7000 })
         .then((response) => {
             const embed = new Discord.MessageEmbed()
                 .setTitle(`Status of ${args[1]}:${response.port}`)
                 .setColor('#0941a9')
                 .setFooter(`Status asked by ${message.author.username}`, message.author.avatarURL)
                 .addField('Players', response.onlinePlayers + '/' + response.maxPlayers)
-                .addField('MOTD', response.motdLine1)
+                .addField('MOTD', response.description.descriptionText)
             message.channel.send({ embed })
         })
         .catch((error) => {

@@ -26,7 +26,7 @@ class CheckAppStoreVersionTask {
                         botManager.saveConfig()
 
 
-                        var embed = new Discord.RichEmbed()
+                        var embed = new Discord.MessageEmbed()
                             .setTitle(`A new version is out on the AppStore: ` + botManager.config["lastVersioniOS"] + " :pushpin:")
                             .setDescription(body.results[0].releaseNotes.substr(0, 2000))
                             .setColor('#0941a9')
@@ -40,11 +40,7 @@ class CheckAppStoreVersionTask {
                     }
 
                 } else {
-                    Bot.users.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
-                            element.send("iOSStore: resultCount: 0");
-                        }
-                    });
+                    botManager.sendToMiste("iOSStore: resultCount: 0")
                 }
             }
         })

@@ -21,7 +21,7 @@ class LatestMcCommand {
             json: true
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
-                var embed = new Discord.RichEmbed()
+                var embed = new Discord.MessageEmbed()
                     .setTitle("Minecraft versions informations")
                     .setDescription("Latest release: " + body["latest"]["release"] + "\nLatest snapshot: " + body["latest"]["snapshot"])
                     .setColor('#0941a9')

@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-var request = require('request');
 require('./../BedrockUpdateBot.js');
 
 class LatestMcpeCommand {
@@ -16,7 +15,7 @@ class LatestMcpeCommand {
     }
 
     static executeCommand(message) {
-        var embed = new Discord.RichEmbed()
+        var embed = new Discord.MessageEmbed()
             .setTitle("Minecraft Bedrock versions informations")
             .setDescription("Latest release: " + botManager.config["lastVersionAndroid"] + "\nLatest beta: " + botManager.config["lastVersionAndroidBeta"])
             .setColor('#0941a9')

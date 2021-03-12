@@ -19,7 +19,7 @@ class CheckFeedbackWebsiteTask {
             json: true
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
-                if (body["Release"][0] != botManager.config["latestFeedbackArticleRelease"] && body["Release"][0] != botManager.config["latestFeedbackArticleRelease2"] && typeof body["Release"][0] !== 'undefined') {
+                if (body["Release"][0] != botManager.config["latestFeedbackArticleRelease"] && body["Release"][0] != botManager.config["latestFeedbackArticleRelease2"] && typeof body["Release"][0] !== 'undefined' && body["Release"][0] != 0) {
                     var text2 = "";
                     for (var index = 0; index < body["Release"][1].length; ++index) {
                         if (body["Release"][1][index] !== "") {
@@ -40,7 +40,7 @@ class CheckFeedbackWebsiteTask {
 
 
                     if (text2.length > 2048) {
-                        var embed = new Discord.RichEmbed()
+                        var embed = new Discord.MessageEmbed()
                             .setTitle(`[RELEASE] A new article is out: ` + body["Release"][0] + " :pushpin:")
                             .setColor('#0941a9')
                             .setDescription(text2.substr(0, 2048))
@@ -50,7 +50,7 @@ class CheckFeedbackWebsiteTask {
                             botManager.sendToChannels('news', "You can see the rest of the changelog on the website (too big to be displayed here).")
                         });
                     } else {
-                        var embed = new Discord.RichEmbed()
+                        var embed = new Discord.MessageEmbed()
                             .setTitle(`A new article is out: ` + body["Release"][0] + " :pushpin:")
                             .setColor('#0941a9')
                             .setDescription(text2)
@@ -64,7 +64,7 @@ class CheckFeedbackWebsiteTask {
                     botManager.saveConfig()
                 }
 
-                if (body["Beta"][0] != botManager.config["latestFeedbackArticleBeta"] && body["Beta"][0] != botManager.config["latestFeedbackArticleBeta2"] && typeof body["Beta"][0] !== 'undefined') {
+                if (body["Beta"][0] != botManager.config["latestFeedbackArticleBeta"] && body["Beta"][0] != botManager.config["latestFeedbackArticleBeta2"] && typeof body["Beta"][0] !== 'undefined' && body["Beta"][0] != 0) {
                     var text2 = "";
                     for (var index = 0; index < body["Beta"][1].length; ++index) {
                         if (body["Beta"][1][index] !== "") {
@@ -85,7 +85,7 @@ class CheckFeedbackWebsiteTask {
 
 
                     if (text2.length > 2048) {
-                        var embed = new Discord.RichEmbed()
+                        var embed = new Discord.MessageEmbed()
                             .setTitle(`[BETA] A new article is out: ` + body["Beta"][0] + " :pushpin:")
                             .setColor('#0941a9')
                             .setDescription(text2.substr(0, 2048))
@@ -95,7 +95,7 @@ class CheckFeedbackWebsiteTask {
                             botManager.sendToChannels('news', "You can see the rest of the changelog on the website (too big to be displayed here).")
                         });
                     } else {
-                        var embed = new Discord.RichEmbed()
+                        var embed = new Discord.MessageEmbed()
                             .setTitle(`A new article is out: ` + body["Beta"][0] + " :pushpin:")
                             .setColor('#0941a9')
                             .setDescription(text2)

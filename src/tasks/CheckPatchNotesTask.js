@@ -27,7 +27,7 @@ class CheckPatchNotesTask {
 
                     botManager.getPatchNotesFrom(body.results[0].id, true, function (response) {
                         if (Array.isArray(response)) {
-                            var embed = new Discord.RichEmbed()
+                            var embed = new Discord.MessageEmbed()
                                 .setTitle("New Patch Notes: " + body.results[0].title.neutral)
                                 .setDescription(response[1])
                                 .setColor('#0941a9')
@@ -39,7 +39,7 @@ class CheckPatchNotesTask {
                                 botManager.sendToChannels('news', embed)
                             });
                         } else {
-                            var embed = new Discord.RichEmbed()
+                            var embed = new Discord.MessageEmbed()
                                 .setTitle("New Patch Notes: " + body.results[0].title.neutral)
                                 .setColor('#0941a9')
                                 .setTimestamp(new Date())

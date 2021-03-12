@@ -23,7 +23,7 @@ class CheckMCLauncherVersionTask {
                     botManager.config["lastMcVersion2"] = botManager.config["lastMcVersion"];
                     botManager.config["lastMcVersion"] = body["versions"][0]["id"];
                     botManager.saveConfig()
-                    var embed = new Discord.RichEmbed()
+                    var embed = new Discord.MessageEmbed()
                         .setTitle("A new " + body["versions"][0]["type"] + " is out on the Minecraft launcher " + botManager.config["lastMcVersion"] + " :pushpin:")
                         .setColor('#0941a9')
                         .setAuthor("BedrockUpdateBot", botManager.avatarURL)
