@@ -1,7 +1,7 @@
 # BedrockUpdateBot
 
 A bot who post all the latest news concerning MCPE/MCPC on your server when they are available !  
-Follow the bot on [Twitter](https://twitter.com/MCBEAlerts) !  
+Follow the bot on [Twitter](https://twitter.com/MCBEAlerts) !
 
 List of supported news:
   - New version of MCBE available on the AppleStore, GooglePlayStore (beta and release), AmazonStore
@@ -14,15 +14,15 @@ List of supported news:
   
  You can now **add this bot to your server** following link: https://discordapp.com/oauth2/authorize?client_id=410839949802209280&scope=bot&permissions=36707392.
 
- ## Deassembly
+ ## Disassembly
 
- When a new release or beta is available on the Google PlayStore, the bot is automatically saving it and then doing some deassembly on using objdump to get the protocol changes, the entity ids list of the version and the symbols list to do some diffs on.
+ When a new release or beta is available on the Google PlayStore, the bot is automatically saving it and then doing some disassembly on using objdump to get the protocol changes, the entity ids list and the symbols list of the version to do some diffs on.
 
-All is posted on github here [minecraft-bedrock-documentation](https://github.com/MisteFr/minecraft-bedrock-documentation)
+Everthing is posted on github: [minecraft-bedrock-documentation](https://github.com/MisteFr/minecraft-bedrock-documentation)
  
  ## Exemples
 
- 1) New version of MCBE available on the GooglePlay Store/Amazon Store
+ 1) New version of MCBE available on the Play Store/Amazon Store
  <img src="https://github.com/MisteFr/BedrockUpdateBot/raw/master/img/exemple1.png" width="450">
  
  2) New article available on the Minecraft website
