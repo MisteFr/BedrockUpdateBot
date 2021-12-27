@@ -1,9 +1,11 @@
 const Discord = require('discord.js');
 const Bot = new Discord.Client();
 
-var BedrockUpdateBotManager = require('./manager/BedrockUpdateBotManager');
+const BedrockUpdateBotManager = require('./manager/BedrockUpdateBotManager');
 
 global.botManager = new BedrockUpdateBotManager()
+
+process.on('unhandledRejection', err => {});
 
 Bot.login(botManager.loginConfig["botToken"]);
 
@@ -17,8 +19,7 @@ Bot.on('error', e => {
 });
 
 Bot.on("guildCreate", guild => {
-  if(botManager.loginConfig['channels'][guild.id] == undefined){
-    //guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
+  if(botManager.loginConfig['channels'][guild.id] === undefined){
     Bot.user.setActivity("Mojang | >help | " + Bot.guilds.cache.size + " guilds", { type: ("WATCHING") });
     console.log(guild.name)
     const defaultChannel = botManager.getDefaultChannel(guild)
@@ -28,6 +29,7 @@ Bot.on("guildCreate", guild => {
     if(guild.owner === null){
       botManager.sendToMiste("Added on " + guild.name + ".")
     }else{
+      guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
       botManager.sendToMiste("Added on " + guild.name + " owned by " + guild.owner.user.username + ".")
     }
   }else{
@@ -56,19 +58,21 @@ Bot.on("guildDelete", guild => {
       botManager.sendToMiste("Removed from " + guild.name + " owned by " + guild.owner.user.username + ".")
     }
   }else{
-    botManager.sendToMiste("Outage for " + guild.name + ".")
+    if (typeof guild.name !== 'undefined'){
+      botManager.sendToMiste("Outage for " + guild.name + ".")
+    }
   }
 })
 
 Bot.on("channelUpdate", (oldChannel, newChannel) => {
-  var guildId = oldChannel.guild.id;
+  let guildId = oldChannel.guild.id;
   if (botManager.Bot.guildsToSend.get(guildId) !== undefined) {
     if (oldChannel.name !== newChannel.name) {
-      var newObject = [];
+      let newObject = [];
 
       botManager.loginConfig['channels'][guildId].forEach(function (element) {
         let key = Object.keys(element)[0];
-        if (key == oldChannel.name) {
+        if (key === oldChannel.name) {
           key = newChannel.name;
         }
         let val = Object.values(element);
@@ -85,10 +89,10 @@ Bot.on("channelUpdate", (oldChannel, newChannel) => {
 })
 
 Bot.on("channelDelete", channel => {
-  var guildId = channel.guild.id;
+  let guildId = channel.guild.id;
   if (botManager.Bot.guildsToSend.get(guildId) !== undefined) {
     if (botManager.loginConfig['channels'][channel.guild.id] !== null && botManager.loginConfig['channels'][channel.guild.id] !== undefined) {
-      if (Object.keys(botManager.loginConfig['channels'][channel.guild.id]).length == 1) {
+      if (Object.keys(botManager.loginConfig['channels'][channel.guild.id]).length === 1) {
         if(botManager.loginConfig['channels'][channel.guild.id][0][channel.name]){
           delete botManager.loginConfig['channels'][channel.guild.id]
         if (botManager.Bot.guildsToSend.has(channel.guild.id)) {
@@ -106,13 +110,13 @@ Bot.on("channelDelete", channel => {
         var newObject = [];
         botManager.loginConfig['channels'][guildId].forEach(function (element) {
           let key = Object.keys(element)[0];
-          if (key != channel.name) {
+          if (key !== channel.name) {
             let val = Object.values(element);
             let objectToSave = {}
             objectToSave[key] = val[0];
             newObject.push(objectToSave)
           }
-          if (Object.keys(element)[0] == channel.name) {
+          if (Object.keys(element)[0] === channel.name) {
             if ((Object.values(element)[0]).includes("news")) {
               botManager.loginConfig["waitingForFinalRegister"].push(channel.guild.id)
               botManager.saveConfig()
@@ -133,6 +137,8 @@ Bot.on("channelDelete", channel => {
 
 
 Bot.on('message', message => {
+  let objectToSave;
+  let nameOfTheChannel;
   if (message.guild) {
     if (message.guild.id === "427140849546035201" && message.author.id === "427139134721622026" && message.channel.name === "json-notifications") {
       botManager.checkVersionAndDownload(message);
@@ -141,9 +147,9 @@ Bot.on('message', message => {
   if (message.guild !== null && message.author.username !== "BedrockUpdateBot") {
     if (botManager.loginConfig["waitingForFinalRegister"].includes(message.guild.id) && message.content.includes('The channel I choose is') && !message.content.includes('Thanks for')) {
       if (message.mentions.channels.size === 1) {
-        var nameOfTheChannel = message.mentions.channels.first().name;
+        let nameOfTheChannel = message.mentions.channels.first().name;
+        let objectToSave = {};
         if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
-          var objectToSave = {}
           objectToSave[nameOfTheChannel] = ["news"];
           botManager.loginConfig['channels'][message.guild.id] = [objectToSave];
           botManager.Bot.guildsToSend.set(message.guild.id, botManager.loginConfig["channels"][message.guild.id]);
@@ -156,11 +162,11 @@ Bot.on('message', message => {
         }
       }
 
-      var nameOfTheChannel = (message.content.replace("The channel I choose is", "")).replace(/\s/g, '');
-      var channelChose = Bot.guilds.cache.get(message.guild.id).channels.cache.find('name', nameOfTheChannel);
+      nameOfTheChannel = (message.content.replace("The channel I choose is", "")).replace(/\s/g, '');
+      let channelChose = Bot.guilds.cache.get(message.guild.id).channels.cache.find('name', nameOfTheChannel);
       if (channelChose !== null && channelChose !== undefined) {
         if (message.author.id === message.guild.ownerID) {
-          var objectToSave = {}
+          objectToSave = {}
           objectToSave[nameOfTheChannel] = ["news"];
           botManager.loginConfig['channels'][message.guild.id] = [objectToSave];
           botManager.Bot.guildsToSend.set(message.guild.id, botManager.loginConfig["channels"][message.guild.id]);
@@ -207,7 +213,7 @@ Bot.on('message', message => {
     return;
   }
 
-  if (command.getPermission() == 'miste' && message.author.id != botManager.config['ownerId']) {
+  if (command.getPermission() === "miste" && message.author.id != botManager.config['ownerId']) {
     return message.reply("You don't have the permission to use this command.");
   }
 

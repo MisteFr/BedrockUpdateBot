@@ -1,5 +1,5 @@
 require('./../BedrockUpdateBot.js')
-var request = require('request');
+const request = require('request');
 const Discord = require('discord.js');
 
 class CheckPatchNotesTask {
@@ -20,14 +20,15 @@ class CheckPatchNotesTask {
             json: true
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
-                if (body.results[0].id !== botManager.config["lastPatchNotes"] && body.results[0].id !== botManager.config["lastPatchNotes2"]) {
+                if (body.results[0].id !== botManager.config["lastPatchNotes"] && body.results[0].id !== botManager.config["lastPatchNotes2"] && body.results[0].id !== botManager.config["lastPatchNotes3"]) {
+                    botManager.config["lastPatchNotes3"] = botManager.config["lastPatchNotes2"];
                     botManager.config["lastPatchNotes2"] = botManager.config["lastPatchNotes"];
                     botManager.config["lastPatchNotes"] = body.results[0].id;
                     botManager.saveConfig()
 
                     botManager.getPatchNotesFrom(body.results[0].id, true, function (response) {
                         if (Array.isArray(response)) {
-                            var embed = new Discord.MessageEmbed()
+                            let embed = new Discord.MessageEmbed()
                                 .setTitle("New Patch Notes: " + body.results[0].title.neutral)
                                 .setDescription(response[1])
                                 .setColor('#0941a9')
@@ -39,7 +40,7 @@ class CheckPatchNotesTask {
                                 botManager.sendToChannels('news', embed)
                             });
                         } else {
-                            var embed = new Discord.MessageEmbed()
+                            let embed = new Discord.MessageEmbed()
                                 .setTitle("New Patch Notes: " + body.results[0].title.neutral)
                                 .setColor('#0941a9')
                                 .setTimestamp(new Date())

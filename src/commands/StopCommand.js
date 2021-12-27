@@ -6,7 +6,7 @@ class StopCommand {
     }
 
     static getDescription() {
-        return 'Stop the song beeing played';
+        return 'Stop the song being played';
     }
 
     static getPermission() {

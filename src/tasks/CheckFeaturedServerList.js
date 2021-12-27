@@ -1,5 +1,5 @@
 require('./../BedrockUpdateBot.js')
-var request = require('request');
+const request = require('request');
 const Discord = require('discord.js');
 
 class CheckFeaturedServerList {
@@ -12,9 +12,16 @@ class CheckFeaturedServerList {
     }
 
     static check(Bot) {
-        var jsonObject = {"count":true,"filter":"(contentType eq '3PP_V2.0') and platforms/any(tp: tp eq 'uwp.store' and tp eq 'title.bedrockvanilla')","orderBy":"startDate desc","scid":"4fc10100-5f7a-4470-899b-280835760c07","select":"images","top":25};
+        let jsonObject = {
+            "count": true,
+            "filter": "(contentType eq '3PP_V2.0') and platforms/any(tp: tp eq 'uwp.store' and tp eq 'title.bedrockvanilla')",
+            "orderBy": "startDate desc",
+            "scid": "4fc10100-5f7a-4470-899b-280835760c07",
+            "select": "images",
+            "top": 25
+        };
 
-        var url = "https://xforge.xboxlive.com/v2/catalog/items/search"
+        let url = "https://xforge.xboxlive.com/v2/catalog/items/search";
         request({
             url: url,
             method: "POST",
@@ -24,16 +31,16 @@ class CheckFeaturedServerList {
             if (!error && response.statusCode === 200) {
                 if (body.count > botManager.config["featuredServersCount"]) {
                     console.log(body)
-                    for (var key in body.results) {
-                        var name = body.results[key]["title"].neutral;
+                    for (let key in body.results) {
+                        let name = body.results[key]["title"].neutral;
                         if (name !== "The Hive" && name !== "Mineplex" && name !== "Lifeboat Network" && name !== "CubeCraft Games" && name !== "Mineville City : Roleplay") {
                             botManager.config["featuredServersCount"] = body.count;
                             botManager.saveConfig()
 
-                            var embed = new Discord.MessageEmbed()
+                            let embed = new Discord.MessageEmbed()
                                 .setTitle('A new featured server is available on MCBE: ' + body.results[key].title.neutral + " :pushpin:")
                                 .setDescription("IP: " + body.results[key].displayProperties.url + "\nPort: " + body.results[key].displayProperties.port + "\nCreator name: " + body.results[key].displayProperties.creatorName)
-                                .setColor('#0941a9')
+                                .setColor('#0941a9');
                             botManager.client.post('statuses/update', { status: '📌 A new featured server is available on MCBE: ' + body.results[key].title.neutral + "!\n\n#RT" }, function (error, tweet, response) {
                                 botManager.sendToChannels('news', embed)
                             });

@@ -1,5 +1,5 @@
 require('./../BedrockUpdateBot.js');
-var fs = require("fs");
+const fs = require("fs");
 const Discord = require('discord.js');
 
 class ContentCommand {
@@ -18,19 +18,19 @@ class ContentCommand {
     static executeCommand(message) {
         let name = message.content.replace(">content ", "");
         if (name !== "") {
-            var contents = fs.readFileSync("/home/MisteBot/MarketplaceData.json");
-            var jsonContent = JSON.parse(contents);
+            let contents = fs.readFileSync("/home/MisteBot/MarketplaceData.json");
+            let jsonContent = JSON.parse(contents);
 
-            var found = false;
-            for (var month in jsonContent["Marketplace"]) {
+            let found = false;
+            for (let month in jsonContent["Marketplace"]) {
                 if (month !== "totalCount") {
-                    for (var content in jsonContent["Marketplace"][month]["results"]) {
+                    for (let content in jsonContent["Marketplace"][month]["results"]) {
                         let pieceOfContent = jsonContent["Marketplace"][month]["results"][content];
 
                         if ((pieceOfContent.title.neutral).toLowerCase() === name.toLowerCase()) {
                             found = true;
 
-                            var embed = new Discord.MessageEmbed()
+                            let embed = new Discord.MessageEmbed()
                                 .setTitle(pieceOfContent.title.neutral)
                                 .setDescription(pieceOfContent.description.neutral)
                                 .setImage(pieceOfContent.images[0].url)
@@ -40,9 +40,9 @@ class ContentCommand {
                                 .addField("Price", pieceOfContent.displayProperties.price)
 
                                 let tagText = ""
-                                for(var key in pieceOfContent.tags){
+                                for(let key in pieceOfContent.tags){
                                     if(pieceOfContent.tags[key].includes("tag")){
-                                        if(tagText == ""){
+                                        if(tagText === ""){
                                             tagText = pieceOfContent.tags[key].split(".")[1]
                                         }else{
                                             tagText = tagText + ", " + pieceOfContent.tags[key].split(".")[1]

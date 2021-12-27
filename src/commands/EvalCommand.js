@@ -14,7 +14,7 @@ class EvalCommand {
     }
 
     static executeCommand(message) {
-        var args = message.content.split(" ").slice(1);
+        let args = message.content.split(" ").slice(1);
         let embed = new Discord.MessageEmbed();
 
         embed.setTitle("Eval:");

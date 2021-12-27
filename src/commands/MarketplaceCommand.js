@@ -18,9 +18,9 @@ class MarketplaceCommand {
         switch(splittedMessage[1]){
             case "register":
                     if (message.mentions.channels.size === 1) {
-                        var nameOfTheChannel = message.mentions.channels.first().name;
+                        let nameOfTheChannel = message.mentions.channels.first().name;
                         if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
-                            var channelFound = false;
+                            let channelFound = false;
                             if(botManager.loginConfig['channels'][message.guild.id]){
                                 botManager.loginConfig['channels'][message.guild.id].forEach(function (element) {
                                     let key = Object.keys(element)[0];
@@ -58,7 +58,8 @@ class MarketplaceCommand {
             break;
             case "unregister":
                     if (message.mentions.channels.size === 1) {
-                        var nameOfTheChannel = message.mentions.channels.first().name;
+                        let nameOfTheChannel = message.mentions.channels.first().name;
+                        let channelFound = false;
                         if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
                             if(botManager.loginConfig['channels'][message.guild.id]){
                                 botManager.loginConfig['channels'][message.guild.id].forEach(function (element) {

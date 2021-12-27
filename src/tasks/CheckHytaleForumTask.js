@@ -1,5 +1,5 @@
 require('./../BedrockUpdateBot.js')
-var request = require('request');
+const request = require('request');
 const Discord = require('discord.js');
 const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
@@ -14,7 +14,7 @@ class CheckHytaleForumTask {
     }
 
     static check(Bot) {
-        var url = "https://www.hytale.com/api/blog/post/published"
+        let url = "https://www.hytale.com/api/blog/post/published";
         request({
             url: url,
             json: true
@@ -24,13 +24,13 @@ class CheckHytaleForumTask {
                     botManager.config["lastHytalePost"] = botManager.config["lastHytalePost2"];
                     botManager.config["lastHytalePost"] = body[0].title;
                     botManager.saveConfig()
-                    var embed = new Discord.MessageEmbed()
+                    let embed = new Discord.MessageEmbed()
                         .setTitle(body[0].title)
                         .setDescription(entities.decode(body[0].bodyExcerpt))
                         .setColor('#0941a9')
                         .setAuthor(body[0].author)
                         .setTimestamp(new Date(body[0].publishedAt))
-                        .setURL("https://www.hytale.com/news/" + (new Date().getFullYear()) + "/" + (new Date().getMonth() + 1) + "/" + body[0].slug)
+                        .setURL("https://www.hytale.com/news/" + (new Date().getFullYear()) + "/" + (new Date().getMonth() + 1) + "/" + body[0].slug);
 
                     botManager.hytaleClient.post('statuses/update', { status: '📌 ' + body[0].title + '\n\n' + (entities.decode(body[0].bodyExcerpt)).substring(0,190) + '..\n\n📲 https://www.hytale.com/news/' + (new Date().getFullYear()) + "/" + (new Date().getMonth() + 1) + "/" + body[0].slug + "" }, function (error, tweet, response) {
                         botManager.sendToChannels('hytale', embed)

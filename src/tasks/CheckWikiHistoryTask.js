@@ -1,5 +1,5 @@
 require('./../BedrockUpdateBot.js')
-var request = require('request');
+const request = require('request');
 const Discord = require('discord.js');
 
 class CheckWikiHistoryTask {
@@ -12,13 +12,13 @@ class CheckWikiHistoryTask {
     }
 
     static check(Bot) {
-        var url = "http://194.9.172.113/WikiHistory.php"
+        let url = "http://194.9.172.113/WikiHistory.php"
         request({
             url: url,
             json: true
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
-                if (body["ScriptingDoc"]["title"] != botManager.config["ScriptingDocTitle"]) {
+                if (body["ScriptingDoc"]["title"] !== botManager.config["ScriptingDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("Scripting documentation updated")
                         .setColor('#0941a9')
@@ -30,13 +30,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["BetaAddonDoc"]["title"] != botManager.config["BetaAddonDocTitle"]) {
+                if (body["BetaAddonDoc"]["title"] !== botManager.config["BetaAddonDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("BetaAddon documentation updated")
                         .setColor('#0941a9')
@@ -48,13 +48,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["UIDoc"]["title"] != botManager.config["UIDocTitle"]) {
+                if (body["UIDoc"]["title"] !== botManager.config["UIDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("UI documentation updated")
                         .setColor('#0941a9')
@@ -66,13 +66,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["ParticleDoc"]["title"] != botManager.config["ParticleDocTitle"]) {
+                if (body["ParticleDoc"]["title"] !== botManager.config["ParticleDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("Particle documentation updated")
                         .setColor('#0941a9')
@@ -84,13 +84,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["MolangDoc"]["title"] != botManager.config["MolangDocTitle"]) {
+                if (body["MolangDoc"]["title"] !== botManager.config["MolangDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("MoLang documentation updated")
                         .setColor('#0941a9')
@@ -102,13 +102,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["AnimationsDoc"]["title"] != botManager.config["AnimationsDocTitle"]) {
+                if (body["AnimationsDoc"]["title"] !== botManager.config["AnimationsDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("Animations documentation updated")
                         .setColor('#0941a9')
@@ -120,13 +120,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["BiomesDoc"]["title"] != botManager.config["BiomesDocTitle"]) {
+                if (body["BiomesDoc"]["title"] !== botManager.config["BiomesDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("Biomes documentation updated")
                         .setColor('#0941a9')
@@ -138,13 +138,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["BlocksDoc"]["title"] != botManager.config["BlocksDocTitle"]) {
+                if (body["BlocksDoc"]["title"] !== botManager.config["BlocksDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("MoLang documentation updated")
                         .setColor('#0941a9')
@@ -156,13 +156,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["EntityComponentDoc"]["title"] != botManager.config["EntityComponentDocTitle"]) {
+                if (body["EntityComponentDoc"]["title"] !== botManager.config["EntityComponentDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("Entity components documentation updated")
                         .setColor('#0941a9')
@@ -174,13 +174,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["EntityEventsDoc"]["title"] != botManager.config["EntityEventsDocTitle"]) {
+                if (body["EntityEventsDoc"]["title"] !== botManager.config["EntityEventsDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("Entity events documentation updated")
                         .setColor('#0941a9')
@@ -192,13 +192,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["RecipesDoc"]["title"] != botManager.config["RecipesDocTitle"]) {
+                if (body["RecipesDoc"]["title"] !== botManager.config["RecipesDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("Recipes Documentation updated")
                         .setColor('#0941a9')
@@ -210,13 +210,13 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });
                     botManager.sendToChannels('documentation', embed)
                 }
-                if (body["SchemasDoc"]["title"] != botManager.config["SchemasDocTitle"]) {
+                if (body["SchemasDoc"]["title"] !== botManager.config["SchemasDocTitle"]) {
                     const embed = new Discord.MessageEmbed()
                         .setTitle("Schemas documentation updated")
                         .setColor('#0941a9')
@@ -228,7 +228,7 @@ class CheckWikiHistoryTask {
                     botManager.saveConfig()
 
                     Bot.users.cache.forEach(function (element) {
-                        if (element.id == botManager.config['ownerId']) {
+                        if (element.id === botManager.config['ownerId']) {
                             element.send(embed)
                         }
                     });

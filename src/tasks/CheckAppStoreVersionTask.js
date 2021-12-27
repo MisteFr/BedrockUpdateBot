@@ -1,5 +1,5 @@
 require('./../BedrockUpdateBot.js')
-var request = require('request');
+const request = require('request');
 const Discord = require('discord.js');
 
 class CheckAppStoreVersionTask {
@@ -12,7 +12,7 @@ class CheckAppStoreVersionTask {
     }
 
     static check(Bot) {
-        var url = "https://itunes.apple.com/lookup?id=%20479516143"
+        let url = "https://itunes.apple.com/lookup?id=%20479516143";
         request({
             url: url,
             json: true
@@ -26,11 +26,11 @@ class CheckAppStoreVersionTask {
                         botManager.saveConfig()
 
 
-                        var embed = new Discord.MessageEmbed()
+                        let embed = new Discord.MessageEmbed()
                             .setTitle(`A new version is out on the AppStore: ` + botManager.config["lastVersioniOS"] + " :pushpin:")
                             .setDescription(body.results[0].releaseNotes.substr(0, 2000))
                             .setColor('#0941a9')
-                            .setTimestamp(new Date(body.results[0].currentVersionReleaseDate))
+                            .setTimestamp(new Date(body.results[0].currentVersionReleaseDate));
 
 
                         botManager.client.post('statuses/update', { status: '📌 A new version is out on the AppleStore: ' + botManager.config["lastVersioniOS"] + " !\n\n#RT" }, function (error, tweet, response) {

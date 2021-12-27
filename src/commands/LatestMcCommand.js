@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-var request = require('request');
+const request = require('request');
 
 class LatestMcCommand {
     static getName() {
@@ -15,13 +15,13 @@ class LatestMcCommand {
     }
 
     static executeCommand(message) {
-        var url = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
+        let url = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
         request({
             url: url,
             json: true
         }, function (error, response, body) {
             if (!error && response.statusCode === 200) {
-                var embed = new Discord.MessageEmbed()
+                let embed = new Discord.MessageEmbed()
                     .setTitle("Minecraft versions informations")
                     .setDescription("Latest release: " + body["latest"]["release"] + "\nLatest snapshot: " + body["latest"]["snapshot"])
                     .setColor('#0941a9')

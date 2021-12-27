@@ -19,7 +19,7 @@ class PatchNotesCommand {
             let args = message.content.split(' ')
             botManager.getPatchNotesFrom(args[1], false, function (response) {
                 if (Array.isArray(response)) {
-                    var embed = new Discord.MessageEmbed()
+                    let embed = new Discord.MessageEmbed()
                         .setTitle("Patch notes from: " + args[1])
                         .addField("Description", response[0])
                         .addField("Patch Notes", response[1])

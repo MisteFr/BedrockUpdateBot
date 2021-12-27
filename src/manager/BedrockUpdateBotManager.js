@@ -7,20 +7,17 @@ const Repeat = require('repeat');
 const path = require("path");
 const Twitter = require('twitter');
 const Discord = require('discord.js');
-var http = require('http');
-var client = require('scp2')
+const http = require('http');
+const client = require('scp2')
 const StreamZip = require('node-stream-zip');
-var request = require('request');
-var Long = require("long");
+const request = require('request');
+const Long = require("long");
 
 class BedrockUpdateBotManager {
 
     constructor() {
         this.voice_handler = null;
-        this.link = null;
         this.array = [];
-        this.errorNumber = 0;
-        this.audio_stream = null;
         this.needConfirmation = undefined;
         this.needConfirmationAuthor = undefined;
         this.LastContent = undefined;
@@ -70,10 +67,11 @@ class BedrockUpdateBotManager {
 
         console.log('Registering channels..')
         this.Bot.guildsToSend = new Discord.Collection();
-        for (var key in this.loginConfig["channels"]) {
+        for (let key in this.loginConfig["channels"]) {
             this.Bot.guildsToSend.set(key, this.loginConfig["channels"][key]);
         }
 
+        /*
         console.log("Checking for servers joined when the bot was offline..")
         var i = 0;
         this.Bot.guilds.cache.forEach(guild => {
@@ -104,6 +102,8 @@ class BedrockUpdateBotManager {
 
         console.log("Removed from " + i + " servers.")
 
+        */
+
         console.log("Checking for servers not being in the waiting list anymore..")
         this.loginConfig['waitingForFinalRegister'].forEach(function (element) {
             let guild = botManager.Bot.guilds.cache.get(element);
@@ -121,9 +121,8 @@ class BedrockUpdateBotManager {
             this.Bot.tasks.set(task.getName(), [task.getDelay(), task.getDelay()]);
         }
         Repeat(this.taskActivator).every('1000', 'ms').start.in('1', 'sec')
-        
+
         console.log('I am ready!');
-        this.sendToMiste("Bot started.")
     }
 
 
@@ -133,17 +132,19 @@ class BedrockUpdateBotManager {
     */
 
     taskActivator() {
-        var Bot = exports.Bot;
+        let Bot = exports.Bot;
+        Bot.user.setActivity("Mojang | >help | " + Bot.guilds.cache.size + " guilds", { type: ("WATCHING") });
         if (!botManager.isDoingDisassembly) {
             if (new Date().getDay() === 2 && new Date().getHours() === 19 && new Date().getMinutes() === 0 && new Date().getSeconds() === 10) {
                 require('./../tasks/CheckMarketplaceTask.js').check(Bot, true);
+                require('./../tasks/CheckPersonaTask.js').check(Bot, true);
             }
             if (new Date().getDay() !== botManager.config["lastSaveDay"]) {
                 botManager.copyFile("/home/MisteBot/MarketplaceData.json", "/var/www/html/MCPE/Marketplace/MarketplaceData-" + Date.now() + ".json")
                 botManager.config["lastSaveDay"] = new Date().getDay();
             }
-            for (var [file, value] of Bot.tasks) {
-                if (value[0] == value[1]) {
+            for (let [file, value] of Bot.tasks) {
+                if (value[0] === value[1]) {
                     if (!this.isDoingMarketplaceCheck) {
                         Bot.tasks.set(file, [value[0], 0]);
                         require('./../tasks/' + file + '.js').check(Bot);
@@ -157,24 +158,29 @@ class BedrockUpdateBotManager {
 
     sendToChannels(type = "news", toSend) {
         this.Bot.guildsToSend.forEach((data, id) => {
-            var guildId = id;
-            for (var key in data) {
-                var channelName = Object.keys(data[key])[0];
-                for (var key2 in Object.values(data[key])) {
-                    for (var key3 in Object.values(data[key])[key2]) {
-                        var requiredType = Object.values(data[key])[key2][key3];
-                        if (requiredType == type) {
-                            var channel = this.Bot.guilds.cache.get(guildId).channels.cache.find(channel => channel.name === channelName);
-                            if (channel !== null && channel !== undefined) {
-
-                                try {
-                                    channel.send(toSend)
-                                } catch (err) {
-                                    const defaultChannel = this.getDefaultChannel(channel.guild)
-                                    if(defaultChannel !== null && defaultChannel !== 'undefined'){
-                                        console.log(defaultChannel)
-                                        defaultChannel.send(toSend)
-                                        defaultChannel.send("Hey <@" + defaultChannel.guild.ownerID + "> !\nI don't have the perms to post in the channel '" + defaultChannel.name + "', can you give me the perms to post their ?")
+            let guildId = id;
+            for (let key in data) {
+                let channelName = Object.keys(data[key])[0];
+                for (let key2 in Object.values(data[key])) {
+                    for (let key3 in Object.values(data[key])[key2]) {
+                        let requiredType = Object.values(data[key])[key2][key3];
+                        if (requiredType === type) {
+                            let guild = this.Bot.guilds.cache.get(guildId)
+                            if (this.Bot.guilds.cache.get(guildId) !== undefined) {
+                                let channel = this.Bot.guilds.cache.get(guildId).channels.cache.find(channel => channel.name === channelName);
+                                if (channel !== null && channel !== undefined) {
+                                    if (channel.permissionsFor(guild.client.user).has(['SEND_MESSAGES', 'EMBED_LINKS'])) {
+                                        channel.send(toSend)
+                                    } else {
+                                        if (guild.owner !== null) {
+                                            guild.owner.user.send("Failed to post in the channel '" + channelName + "'. Please fix the permissions. If you have any issues setting up the bot, dm Miste#0001.");
+                                        } else {
+                                            const defaultChannel = this.getDefaultChannel(channel.guild)
+                                            if (defaultChannel !== null && defaultChannel !== 'undefined') {
+                                                defaultChannel.send(toSend)
+                                                defaultChannel.send("Failed to post in the channel '" + channelName + "'. Please fix the permissions.")
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -185,15 +191,22 @@ class BedrockUpdateBotManager {
         });
         if (type === "news") {
             botManager.loginConfig['waitingForFinalRegister'].forEach(function (element) {
-                var guild = botManager.Bot.guilds.cache.get(element)
-                if (guild !== undefined) { 
+                let guild = botManager.Bot.guilds.cache.get(element)
+                if (guild !== undefined) {
+                    if (guild.owner !== null) {
+                        guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
+                    }
                     const defaultChannel2 = botManager.getDefaultChannel(guild)
-                    if(defaultChannel2 !== null && defaultChannel2 !== 'undefined' && typeof defaultChannel2 !== 'undefined'){
-                        try {
-                            defaultChannel2.send(toSend)
-                            defaultChannel2.send("Hey <@" + guild.ownerID + "> !\nYou didnt set any channel for me to post in so I posted in the first channel I found :(.\nYou can fix this problem by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
-                        } catch (err) {
-                            console.log(err)
+                    if (defaultChannel2 !== null && defaultChannel2 !== 'undefined' && typeof defaultChannel2 !== 'undefined') {
+                        if (defaultChannel2.permissionsFor(guild.client.user).has("SEND_MESSAGES")) {
+                            try {
+                                defaultChannel2.send(toSend)
+                                defaultChannel2.send("Hey <@" + guild.ownerID + "> !\nYou didnt set any channel for me to post in so I posted in the first channel I found :(.\nYou can fix this problem by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
+                            } catch (err) {
+                                console.log(err)
+                            }
+                        } else {
+                            botManager.sendToMiste("Can't send message for channel: " + defaultChannel2.name)
                         }
                     }
                 }
@@ -219,8 +232,8 @@ class BedrockUpdateBotManager {
             let messageCount = messagesArr.length;
             let i2 = 0;
             for (let i = 0; i < messageCount; i++) {
-                if (messagesArr[i].author.username == "BedrockUpdateBot" && messagesArr[i].content.includes("CONSOLE")) {
-                    if (i2 == 0) {
+                if (messagesArr[i].author.username === "BedrockUpdateBot" && messagesArr[i].content.includes("CONSOLE")) {
+                    if (i2 === 0) {
                         messagesArr[i].edit("```" + this.LastContent + "\n" + content + "```");
                         this.LastContent = this.LastContent + "\n" + content;
                     }
@@ -230,12 +243,16 @@ class BedrockUpdateBotManager {
         });
     }
 
-    sendToMiste(message){
-        this.Bot.users.cache.forEach(function (element) {
-            if (element.id == botManager.loginConfig["ownerId"]) {
-                element.send(message);
-            }
-        });
+    sendToMiste(message) {
+        if (this.Bot) {
+            this.Bot.users.cache.forEach(function (element) {
+                if (element.id === botManager.loginConfig["ownerId"]) {
+                    element.send(message);
+                }
+            });
+        }else{
+            console.log(message)
+        }
     }
 
     getImage(url, callback) {
@@ -259,52 +276,46 @@ class BedrockUpdateBotManager {
     }
 
     cleanArray(actual) {
-        var newArray = new Array();
-        for (var i = 0; i < actual.length; i++) {
+        let newArray = [];
+        for (let i = 0; i < actual.length; i++) {
             if (actual[i]) {
                 newArray.push(actual[i]);
             }
         }
         return newArray;
     }
-
-    sleep(sleepDuration) {
-        var now = new Date().getTime();
-        while (new Date().getTime() < now + sleepDuration) { /* do nothing (doesnt affect the child process)*/ }
-    }
-
     getDefaultChannel = (guild) => {
         // get "original" default channel
-        if(guild.channels.cache.has(guild.id))
-          return guild.channels.cache.get(guild.id)
-      
+        if (guild.channels.cache.has(guild.id))
+            return guild.channels.cache.get(guild.id)
+
         // Check for a "general" channel, which is often default chat
         const generalChannel = guild.channels.cache.find(channel => channel.name === "general");
         if (generalChannel)
-          return generalChannel;
+            return generalChannel;
         // Now we get into the heavy stuff: first channel in order where the bot can speak
         // hold on to your hats!
         return guild.channels.cache
-         .filter(c => c.type === "text" &&
-           c.permissionsFor(guild.client.user).has("SEND_MESSAGES"))
-         .sort((a, b) => a.position - b.position ||
-           Long.fromString(a.id).sub(Long.fromString(b.id)).toNumber())
-         .first();
+            .filter(c => c.type === "text" &&
+                c.permissionsFor(guild.client.user).has("SEND_MESSAGES"))
+            .sort((a, b) => a.position - b.position ||
+                Long.fromString(a.id).sub(Long.fromString(b.id)).toNumber())
+            .first();
     }
 
     checkVersionAndDownload(message) {
         let messageJson = JSON.parse(message.content.replace(/`/g, ""));
         let needDownload = false;
-        for (var i = 0; i < messageJson.updates.length; i++) {
+        for (let i = 0; i < messageJson.updates.length; i++) {
             if (messageJson.updates[i].packageMoniker.includes("x64")) {
-                var versionObject = messageJson.updates[i];
+                let versionObject = messageJson.updates[i];
                 break;
             }
         }
         if (messageJson.isBeta === true) {
             if (botManager.config["win10Versions"][versionObject.packageMoniker] === undefined) {
-                var versionName = (versionObject.packageMoniker.split("_")[1]);
-                var embed = new Discord.RichEmbed()
+                let versionName = (versionObject.packageMoniker.split("_")[1]);
+                let embed = new Discord.RichEmbed()
                     .setTitle("New beta available on the Win10 Store: " + versionName)
                     .setColor('#0941a9')
                     .setAuthor("BedrockUpdateBot", botManager.avatarURL)
@@ -318,8 +329,8 @@ class BedrockUpdateBotManager {
             }
         } else {
             if (botManager.config["win10Versions"][versionObject.packageMoniker] === undefined) {
-                var versionName = (versionObject.packageMoniker.split("_")[1]);
-                var embed = new Discord.RichEmbed()
+                let versionName = (versionObject.packageMoniker.split("_")[1]);
+                let embed = new Discord.RichEmbed()
                     .setTitle("New release available on the Win10 Store: " + versionName)
                     .setColor('#0941a9')
                     .setAuthor("BedrockUpdateBot", botManager.avatarURL)
@@ -334,12 +345,12 @@ class BedrockUpdateBotManager {
             }
         }
         if (needDownload) {
-            var packageMoniker = versionObject.packageMoniker;
-            var url = versionObject.downloadUrl;
+            let packageMoniker = versionObject.packageMoniker;
+            let url = versionObject.downloadUrl;
             if (!fs.existsSync("MCPE/Windows/" + versionName + "/")) {
                 fs.mkdirSync("MCPE/Windows/" + versionName + "/")
             }
-            var fStream = fs.createWriteStream("MCPE/Windows/" + versionName + "/" + packageMoniker + ".appx");
+            let fStream = fs.createWriteStream("MCPE/Windows/" + versionName + "/" + packageMoniker + ".appx");
             const request = http.get(url, function (response) {
                 response.pipe(fStream);
             });
@@ -423,8 +434,8 @@ class BedrockUpdateBotManager {
             }, function (error, response, body) {
                 if (!error && response.statusCode === 200) {
                     if (body.count > 0) {
-                        var patchId = body.results[0].id;
-                        var patchDescription = body.results[0].description.neutral;
+                        let patchId = body.results[0].id;
+                        let patchDescription = body.results[0].description.neutral;
                         request({
                             url: "https://xforge.xboxlive.com/v2/catalog/items/" + patchId,
                             method: "GET",
@@ -487,8 +498,8 @@ class BedrockUpdateBotManager {
     }
 
     copyFile(source, target) {
-        var rd = fs.createReadStream(source);
-        var wr = fs.createWriteStream(target);
+        let rd = fs.createReadStream(source);
+        let wr = fs.createWriteStream(target);
         return new Promise(function (resolve, reject) {
             rd.on('error', reject);
             wr.on('error', reject);

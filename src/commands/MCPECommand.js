@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-var util = require('minecraft-server-util');
+const util = require('minecraft-server-util');
 require('./../BedrockUpdateBot.js');
 
 class LatestMcpeCommand {
@@ -21,7 +21,7 @@ class LatestMcpeCommand {
             message.channel.send('Please give a port to query (>mcpe <ip> <port>).')
             return
         }
-        util.statusBedrock(args[1], { port: parseInt(args[2]), enableSRV: true, timeout: 7000 })
+        util.statusBedrock(args[1], { port: parseInt(args[2]), enableSRV: true, timeout: 10000 })
         .then((response) => {
             const embed = new Discord.MessageEmbed()
                 .setTitle(`Status of ${args[1]}:${response.port}`)
