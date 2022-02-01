@@ -11,8 +11,12 @@ class CheckMinecraftWebsiteTask {
         return "CheckMinecraftWebsiteTask";
     }
 
+    static shouldRun() {
+        return false;
+    }
+
     static check(Bot) {
-        let url = "https://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/news,minecraft:article/insider,minecraft:article/culture,minecraft:article/merch,minecraft:stockholm/news,minecraft:stockholm/guides,minecraft:stockholm/events,minecraft:stockholm/minecraft-builds,minecraft:stockholm/marketplace,minecraft:stockholm/deep-dives,minecraft:stockholm/merch,minecraft:stockholm/earth,minecraft:stockholm/dungeons,minecraft:stockholm/realms-plus,minecraft:stockholm/realms-java,minecraft:stockholm/minecraft,minecraft:stockholm/nether&propResPath=/content/minecraft-net/language-masters/en-us/jcr:content/root/generic-container/par/bleeding_page_sectio_1278766118/page-section-par/grid&count=500&pageSize=4&lang=/content/minecraft-net/language-masters/en-us"
+        let url = "http://www.minecraft.net/content/minecraft-net/_jcr_content.articles.grid?tileselection=auto&tagsPath=minecraft:article/news,minecraft:article/insider,minecraft:article/culture,minecraft:article/merch,minecraft:stockholm/news,minecraft:stockholm/guides,minecraft:stockholm/events,minecraft:stockholm/minecraft-builds,minecraft:stockholm/marketplace,minecraft:stockholm/deep-dives,minecraft:stockholm/merch,minecraft:stockholm/earth,minecraft:stockholm/dungeons,minecraft:stockholm/realms-plus,minecraft:stockholm/realms-java,minecraft:stockholm/minecraft,minecraft:stockholm/nether&propResPath=/content/minecraft-net/language-masters/en-us/jcr:content/root/generic-container/par/bleeding_page_sectio_1278766118/page-section-par/grid&count=500&pageSize=4&lang=/content/minecraft-net/language-masters/en-us"
         request({
             url: url,
             json: true
@@ -20,6 +24,8 @@ class CheckMinecraftWebsiteTask {
             if (!error && response.statusCode === 200) {
                 let toCheck = botManager.config["textContainingTitles"];
                 body["article_grid"].forEach(function (element) {
+                    console.log(element["default_tile"]["title"])
+                    console.log("last: " + botManager.config["lastWebsiteArticle"])
                     if (!(toCheck.includes(element["default_tile"]["title"])) && botManager.config["lastWebsiteArticle"] !== element["default_tile"]["title"]) {
                         console.log(element["default_tile"]["title"]);
                         botManager.config["textContainingTitles"] += element["default_tile"]["title"] + ", ";
@@ -59,6 +65,11 @@ class CheckMinecraftWebsiteTask {
                         });
                     }
                 });
+            }else{
+                console.log("heres")
+                console.log(response)
+                console.log(error)
+                console.log(body)
             }
         })
     }

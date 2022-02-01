@@ -71,13 +71,13 @@ class BedrockUpdateBotManager {
             this.Bot.guildsToSend.set(key, this.loginConfig["channels"][key]);
         }
 
-        /*
+
         console.log("Checking for servers joined when the bot was offline..")
         var i = 0;
         this.Bot.guilds.cache.forEach(guild => {
             if (!this.loginConfig['waitingForFinalRegister'].includes(guild.id) && this.loginConfig['channels'][guild.id] === undefined) {
                 const defaultChannel = this.getDefaultChannel(guild)
-                defaultChannel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
+                //defaultChannel.send("Hey <@" + guild.ownerID + "> !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by answering to this message 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**")
                 this.loginConfig["waitingForFinalRegister"].push(guild.id)
                 this.saveConfig()
                 i++;
@@ -102,7 +102,7 @@ class BedrockUpdateBotManager {
 
         console.log("Removed from " + i + " servers.")
 
-        */
+
 
         console.log("Checking for servers not being in the waiting list anymore..")
         this.loginConfig['waitingForFinalRegister'].forEach(function (element) {
@@ -118,7 +118,9 @@ class BedrockUpdateBotManager {
         this.Bot.tasks = new Discord.Collection();
         for (let file of taskFolder) {
             let task = require('./../tasks/' + file);
-            this.Bot.tasks.set(task.getName(), [task.getDelay(), task.getDelay()]);
+            if(task.shouldRun()){
+                this.Bot.tasks.set(task.getName(), [task.getDelay(), task.getDelay()]);
+            }
         }
         Repeat(this.taskActivator).every('1000', 'ms').start.in('1', 'sec')
 
@@ -139,7 +141,7 @@ class BedrockUpdateBotManager {
                 require('./../tasks/CheckMarketplaceTask.js').check(Bot, true);
                 require('./../tasks/CheckPersonaTask.js').check(Bot, true);
             }
-            if (new Date().getDay() !== botManager.config["lastSaveDay"]) {
+            if (new Date().getDay() !== botManager.config["lastSaveDay"] && new Date().getDay() !== (botManager.config["lastSaveDay"]+1)) {
                 botManager.copyFile("/home/MisteBot/MarketplaceData.json", "/var/www/html/MCPE/Marketplace/MarketplaceData-" + Date.now() + ".json")
                 botManager.config["lastSaveDay"] = new Date().getDay();
             }
@@ -246,7 +248,7 @@ class BedrockUpdateBotManager {
     sendToMiste(message) {
         if (this.Bot) {
             this.Bot.users.cache.forEach(function (element) {
-                if (element.id === botManager.loginConfig["ownerId"]) {
+                if (element.id == botManager.loginConfig["ownerId"]) {
                     element.send(message);
                 }
             });

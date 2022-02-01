@@ -11,6 +11,10 @@ class CheckBedrockServerTask {
         return "CheckBedrockServerTask";
     }
 
+    static shouldRun() {
+        return false;
+    }
+
     static check(Bot) {
         let url = "http://194.9.172.113/BedrockServer.php";
         request({

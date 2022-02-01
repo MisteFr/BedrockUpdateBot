@@ -11,6 +11,10 @@ class CheckAppStoreVersionTask {
         return "CheckAppStoreVersionTask";
     }
 
+    static shouldRun() {
+        return true;
+    }
+
     static check(Bot) {
         let url = "https://itunes.apple.com/lookup?id=%20479516143";
         request({

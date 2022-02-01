@@ -12,7 +12,12 @@ class CheckFeedbackWebsiteTask {
         return "CheckFeedbackWebsiteTask";
     }
 
+    static shouldRun() {
+        return false;
+    }
+
     static check(Bot) {
+        //not working anymore
         let url = "http://194.9.172.113/PMMPBot.php";
         request({
             url: url,

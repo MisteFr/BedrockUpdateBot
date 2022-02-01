@@ -13,6 +13,10 @@ class CheckHytaleForumTask {
         return "CheckHytaleForumTask";
     }
 
+    static shouldRun() {
+        return true;
+    }
+
     static check(Bot) {
         let url = "https://www.hytale.com/api/blog/post/published";
         request({

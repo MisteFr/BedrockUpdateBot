@@ -11,6 +11,10 @@ class CheckFeaturedServerList {
         return "CheckFeaturedServerList";
     }
 
+    static shouldRun() {
+        return true;
+    }
+
     static check(Bot) {
         let jsonObject = {
             "count": true,

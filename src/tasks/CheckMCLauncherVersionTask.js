@@ -11,6 +11,10 @@ class CheckMCLauncherVersionTask {
         return "CheckMCLauncherVersionTask";
     }
 
+    static shouldRun() {
+        return true;
+    }
+
     static check(Bot) {
         var url = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
         request({

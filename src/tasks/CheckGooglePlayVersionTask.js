@@ -12,11 +12,38 @@ class CheckGooglePlayVersionTask {
         return "CheckGooglePlayVersionTask";
     }
 
+    static shouldRun() {
+        return true;
+    }
+
     static check(Bot) {
+        var gplay = require('google-play-scraper');
+        gplay.app({appId: 'com.mojang.minecraftpe'}).then((app) => {
+            if (app.version !== botManager.config["lastVersionAndroid"] && app.version !== botManager.config["lastVersionAndroid2"]) {
+                botManager.config["lastVersionAndroid2"] = botManager.config["lastVersionAndroid"];
+                botManager.config["lastVersionAndroid"] = app.version;
+                botManager.config["lastVersionReleased"] = app.version;
+                botManager.config["lastVersionReleasedIsBeta"] = false;
+                botManager.saveConfig()
+
+                let embed = new Discord.MessageEmbed()
+                    .setTitle(`A new version is out on the Google Play Store: ` + botManager.config["lastVersionAndroid"] + " :pushpin:")
+                    .setDescription(app.recentChanges)
+                    .setColor('#0941a9');
+
+                botManager.client.post('statuses/update', {status: '📌 A new version is out on the Google Play Store: ' + app.version + " !\n\n#RT"}, function (error, tweet, response) {
+                    botManager.sendToChannels('news', embed)
+                    botManager.sendToChannels('debug', "A new version is out on the GooglePlayStore ! (" + botManager.config["lastVersionAndroid"] + ") ")
+                });
+            }
+        });
+
+
         /*
             Initializing them in the botManager corrupt the object for some reasons
         */
 
+        /*
         let betaAccount = require('gpapi').GooglePlayAPI({
             username: botManager.loginConfig["betaAccount"]["username"],
             password: botManager.loginConfig["betaAccount"]["password"],
@@ -34,7 +61,11 @@ class CheckGooglePlayVersionTask {
         });
 
         betaAccount.bulkDetails("com.mojang.minecraftpe", function (err, res) {
+            console.log("HELLLO FROM HERE SIR")
+            console.log(err)
+            console.log(res)
             if(res){
+                console.log("2")
                 console.log(res)
                 if (res[0] !== null) {
 
@@ -113,6 +144,8 @@ class CheckGooglePlayVersionTask {
     
                     console.log(normalVersionCode)
                     */
+
+        /*
     
                     if (normalVersion !== botManager.config["lastVersionAndroid"] && normalVersion !== botManager.config["lastVersionAndroid2"]) {
                         botManager.config["lastVersionAndroid2"] = botManager.config["lastVersionAndroid"];
@@ -170,6 +203,7 @@ class CheckGooglePlayVersionTask {
                 }
             }
         });
+        */
     }
 }
 
