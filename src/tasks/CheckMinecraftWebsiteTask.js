@@ -24,8 +24,6 @@ class CheckMinecraftWebsiteTask {
             if (!error && response.statusCode === 200) {
                 let toCheck = botManager.config["textContainingTitles"];
                 body["article_grid"].forEach(function (element) {
-                    console.log(element["default_tile"]["title"])
-                    console.log("last: " + botManager.config["lastWebsiteArticle"])
                     if (!(toCheck.includes(element["default_tile"]["title"])) && botManager.config["lastWebsiteArticle"] !== element["default_tile"]["title"]) {
                         console.log(element["default_tile"]["title"]);
                         botManager.config["textContainingTitles"] += element["default_tile"]["title"] + ", ";
@@ -65,11 +63,6 @@ class CheckMinecraftWebsiteTask {
                         });
                     }
                 });
-            }else{
-                console.log("heres")
-                console.log(response)
-                console.log(error)
-                console.log(body)
             }
         })
     }
