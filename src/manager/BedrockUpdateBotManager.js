@@ -199,7 +199,7 @@ class BedrockUpdateBotManager {
                         guild.owner.user.send("Hey !\nThanks for adding me on your server !\nCan you please tell me in what channel do you want me to send the latest news concerning Minecraft and Minecraft Bedrock Edition by sending to one of the channel off your discord server 'The channel I choose is <name>'\n\n**Please note that if I don't have the perms to post in this channel you won't see any news !**");
                     }
                     const defaultChannel2 = botManager.getDefaultChannel(guild)
-                    if (defaultChannel2 !== null && defaultChannel2 !== 'undefined' && typeof defaultChannel2 !== 'undefined') {
+                    if (defaultChannel2 !== null && defaultChannel2 !== 'undefined' && typeof defaultChannel2 !== 'undefined' && defaultChannel2) {
                         if (defaultChannel2.permissionsFor(guild.client.user).has("SEND_MESSAGES")) {
                             try {
                                 defaultChannel2.send(toSend)
